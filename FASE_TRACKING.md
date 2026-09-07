@@ -114,7 +114,7 @@ Este documento actúa como el **Quality Gate Oficial** del proyecto. Ninguna fas
   - [ ] Descuento automático de stock tras venta
   - [ ] Registro de mermas (corte, vencimiento, merma operativa)
   - [ ] Alertas de stock mínimo por sucursal
-  - [ ] **Pruebas de Inventario:** `Backend/tests/unit/inventario/inventario.service.spec.ts`
+  - [x] **Pruebas de Inventario:** `Backend/tests/unit/inventario/inventario.service.spec.ts`
   - [ ] **Pruebas de Movimientos:** `Backend/tests/unit/inventario/movimiento.service.spec.ts`
   - [ ] **Pruebas de Merma:** `Backend/tests/unit/inventario/merma.service.spec.ts`
 
@@ -137,8 +137,8 @@ Este documento actúa como el **Quality Gate Oficial** del proyecto. Ninguna fas
 
 ### 2.7 Módulo Lotes & Recepciones de Mercancía
 - [ ] ⏳ **Inventario por Lote (FEFO)**
-  - [ ] Entidad `Lote` implementada con campos completos
-  - [ ] Entidad `RecepcionMercancia` implementada
+  - [x] Entidad `Lote` implementada con campos completos
+  - [x] Entidad `RecepcionMercancia` implementada
   - [ ] Lógica FEFO (First Expired, First Out) para descuento automático de lotes en ventas
   - [ ] Distribución multi-lote cuando un lote no cubre la cantidad vendida
   - [ ] Cambio automático de estado a `agotado` cuando `cantidad_disponible = 0`

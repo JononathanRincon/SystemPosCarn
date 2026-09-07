@@ -63,7 +63,7 @@
 
 ## Bloque 4: Backend — Inventario, Recepciones y Lotes (FEFO)
 
-- [ ] **TASK-09: Entidades Lote y RecepcionMercancia**
+- [x] **TASK-09: Entidades Lote y RecepcionMercancia**
   - *Objetivo:* Implementar entidades TypeORM/Prisma para `Lote` y `RecepcionMercancia` con campos de costo, proveedor, vencimiento y temperatura.
   - *Trazabilidad:* EARS-LOTE-01, US-15.
   - *Prueba Verificable:* `npm run test -- inventario.service.spec.ts`.
