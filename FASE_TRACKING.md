@@ -129,11 +129,11 @@ Este documento actúa como el **Quality Gate Oficial** del proyecto. Ninguna fas
   - [ ] **Prueba de Integración Concurrente:** `Backend/tests/integration/sync-conflicto.integration.spec.ts`
 
 ### 2.6 Módulo Corte de Caja
-- [ ] ⏳ **Apertura y Cierre de Turno**
-  - [ ] Apertura con base inicial en efectivo
-  - [ ] Cuadre de caja por método de pago (`contado - esperado`)
-  - [ ] **Pruebas de Corte de Caja:** `Backend/tests/unit/corte-caja/corte-caja.service.spec.ts`
-  - [ ] **Prueba de Integración de Flujo de Caja:** `Backend/tests/integration/corte-caja.integration.spec.ts`
+- [x] ✅ **Apertura y Cierre de Turno**
+  - [x] Apertura con base inicial en efectivo
+  - [x] Cuadre de caja por método de pago (`contado - esperado`)
+  - [x] **Pruebas de Corte de Caja:** `Backend/tests/unit/corte-caja/corte-caja.service.spec.ts`
+  - [x] **Prueba de Integración de Flujo de Caja:** `Backend/tests/integration/corte-caja.integration.spec.ts`
 
 ### 2.7 Módulo Lotes & Recepciones de Mercancía
 - [x] ✅ **Inventario por Lote (FEFO)**

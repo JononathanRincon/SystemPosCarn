@@ -66,8 +66,8 @@ Para asegurar la máxima calidad sin degradar la memoria del agente, cada fase y
 - [x] **2.4.4 Control de Alertas de Stock Crítico y Lotes por Vencer:** Emisión de alertas cuando existencias $\le$ mínimo o caducidad $\le$ 3 días.
 
 ### 2.5 Módulo de Cortes de Caja y Auditoría
-- [ ] **2.5.1 Apertura de Turno con Base Inicial:** Endpoint `/cash-shifts/open` con base de efectivo obligatoria; bloqueo de ventas si la caja está cerrada.
-- [ ] **2.5.2 Conciliación de Turno y Cuadre de Caja:** Endpoint `/cash-cuts` con cálculo de diferencia inmutable (`contado - esperado`).
+- [x] **2.5.1 Apertura de Turno con Base Inicial:** Endpoint `/cash-shifts/open` con base de efectivo obligatoria; bloqueo de ventas si la caja está cerrada.
+- [x] **2.5.2 Conciliación de Turno y Cuadre de Caja:** Endpoint `/cash-cuts` con cálculo de diferencia inmutable (`contado - esperado`).
 - [ ] **2.5.3 Ingresos Extraordinarios y Ajustes de Base:** Registro de entradas de efectivo sin alterar métricas de ventas.
 
 ### 2.6 Motor de Sincronización Offline-First Idempotente

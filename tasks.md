@@ -82,7 +82,7 @@
 
 ## Bloque 5: Backend — Ventas, Pagos y Turnos de Caja
 
-- [ ] **TASK-12: Ciclo de Turno de Caja (Apertura con Base y Cierre)**
+- [x] **TASK-12: Ciclo de Turno de Caja (Apertura con Base y Cierre)**
   - *Objetivo:* Implementar endpoints `/cash-shifts/open`, `/cash-shifts/current` y `/cash-cuts` con cálculo de diferencia.
   - *Trazabilidad:* EARS-CAJA-02, EARS-CAJA-03, EARS-CAJA-04, US-06.
   - *Prueba Verificable:* `npm run test -- corte-caja.integration.spec.ts`.
