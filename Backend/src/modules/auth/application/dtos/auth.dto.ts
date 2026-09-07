@@ -1,4 +1,12 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  MinLength,
+  IsUUID,
+  Matches,
+  IsOptional,
+} from 'class-validator';
 
 export interface TokenPayload {
   sub: string;
@@ -52,3 +60,35 @@ export interface RefreshResponseDto {
   accessToken: string;
   refreshToken: string;
 }
+
+export class PinLoginDto {
+  @IsUUID('4', { message: 'El sucursalId debe ser un UUID válido' })
+  @IsNotEmpty({ message: 'El sucursalId es requerido' })
+  sucursalId!: string;
+
+  @IsString({ message: 'El PIN debe ser una cadena de texto' })
+  @IsNotEmpty({ message: 'El PIN es requerido' })
+  @Matches(/^\d{4}$/, { message: 'El PIN debe tener exactamente 4 dígitos numéricos' })
+  pin!: string;
+
+  @IsString({ message: 'El dispositivoId debe ser una cadena de texto' })
+  @IsNotEmpty({ message: 'El dispositivoId es requerido' })
+  dispositivoId!: string;
+
+  @IsOptional()
+  @IsUUID('4', { message: 'El userId debe ser un UUID válido' })
+  userId?: string;
+}
+
+export interface PinLoginUserDto {
+  id: string;
+  nombre: string;
+  rol: string;
+}
+
+export interface PinLoginResponseDto {
+  valid: boolean;
+  user: PinLoginUserDto;
+  sessionToken: string;
+}
+

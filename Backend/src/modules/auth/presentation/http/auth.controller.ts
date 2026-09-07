@@ -10,7 +10,14 @@ import {
 } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { AuthService } from '../../application/services/auth.service';
-import { LoginDto, RefreshTokenDto, LoginResponseDto, RefreshResponseDto } from '../../application/dtos/auth.dto';
+import {
+  LoginDto,
+  RefreshTokenDto,
+  LoginResponseDto,
+  RefreshResponseDto,
+  PinLoginDto,
+  PinLoginResponseDto,
+} from '../../application/dtos/auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -62,4 +69,15 @@ export class AuthController {
 
     return result;
   }
+
+  /**
+   * Endpoint POST /auth/pin-login (design.md sec. 7.1 endpoint 3, EARS-AUTH-03, EARS-AUTH-04)
+   * Validación local rápida de PIN para cajeros con mitigación de fuerza bruta (bloqueo tras 3 intentos erróneos durante 60s).
+   */
+  @Post('pin-login')
+  @HttpCode(HttpStatus.OK)
+  async pinLogin(@Body() pinLoginDto: PinLoginDto): Promise<PinLoginResponseDto> {
+    return this.authService.pinLogin(pinLoginDto);
+  }
 }
+
