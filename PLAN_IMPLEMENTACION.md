@@ -48,7 +48,7 @@ Para asegurar la máxima calidad sin degradar la memoria del agente, cada fase y
 - [x] **2.1.4 Sistema de Autorización Basado en Roles (RBAC):** Guards granulares (`RolesGuard`, `PermissionsGuard`) para cajero, gerente y administrador.
 
 ### 2.2 Módulo Multi-Tenant y Catálogo Avanzado
-- [ ] **2.2.1 Aislamiento Multi-Tenant Estricto:** Middleware de extracción de `tenant_id` y aplicación forzada de políticas RLS en Supabase.
+- [x] **2.2.1 Aislamiento Multi-Tenant Estricto:** Middleware de extracción de `tenant_id` y aplicación forzada de políticas RLS en Supabase.
 - [ ] **2.2.2 CRUD de Sucursales y Dispositivos:** Gestión de sedes y registro seguro de terminales POS con generación de `token_dispositivo`.
 - [ ] **2.2.3 Catálogo de Categorías y Productos Cárnicos:** Soporte para productos por peso (precisión al gramo `decimal(10,3)`) y por unidad.
 - [ ] **2.2.4 Cache-Aside de Catálogo en Redis:** Inyección de Redis para lectura rápida del catálogo (TTL 1h) con invalidación reactiva al actualizar precios.

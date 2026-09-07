@@ -49,7 +49,7 @@
 
 ## Bloque 3: Backend — Catálogo y Multi-Tenant
 
-- [ ] **TASK-07: Aislamiento Multi-Tenant en Servicios de Catálogo**
+- [x] **TASK-07: Aislamiento Multi-Tenant en Servicios de Catálogo**
   - *Objetivo:* Crear servicios de `Negocio`, `Sucursal` y middleware/interceptor para inyectar `tenant_id` en todas las consultas.
   - *Trazabilidad:* NFR-Aislamiento, US-10.
   - *Prueba Verificable:* `npm run test -- multi-tenant.integration.spec.ts`.

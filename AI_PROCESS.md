@@ -374,3 +374,58 @@ PLANTILLA ESQUELETO PARA NUEVAS ENTRADAS
   - `PLAN_IMPLEMENTACION.md` (Items 2.1.3 y 2.1.4 marcados con `[x]`)
   - `AI_PROCESS.md` (Bitácora Entrada 6 registrada)
 
+---
+
+## Entrada 7
+
+- **Fecha:** 2026-09-07
+- **Modelo/herramienta:** Antigravity (Gemini 3.8 Flash)
+- **Prompt utilizado (completo):**
+  ```text
+  okey /goal continuar con el proceso bloque 3 siguiendo las buenas practicas mencionadas en AGENTS.md
+  ```
+- **Output del agente / Respuesta de la herramienta (resumen ejecutivo):**
+  ```text
+  TASK-07 completada con éxito bajo protocolo estricto GitFlow y Loop Engineering:
+  - Entidad de dominio Negocio (design.md sec. 2) con validación de invariantes, planes (basico, pro, enterprise) y métodos comerciales.
+  - Entidad de dominio Sucursal con vinculación forzada a negocioId para garantizar aislamiento multi-tenant estricto.
+  - Puertos de repositorio NegocioRepositoryPort y SucursalRepositoryPort con consultas aisladas por tenant.
+  - DTOs de validación CreateNegocioDto, UpdateNegocioDto, CreateSucursalDto, UpdateSucursalDto con class-validator.
+  - TenantContextService implementado sobre AsyncLocalStorage para garantizar contextos de ejecución de tenant aislados, no bloqueantes y thread-safe ante peticiones concurrentes.
+  - TenantMiddleware y TenantInterceptor para inyección y extracción determinista de tenant_id desde tokens JWT y cabeceras X-Tenant-ID.
+  - NegocioService con verificación de unicidad de NIT/RUT (ConflictException) y gestión de datos comerciales.
+  - SucursalService con aislamiento forzado por tenant: listados, búsquedas por ID, actualizaciones y eliminaciones estrictamente restringidas al tenant activo (cero fuga de datos cross-tenant).
+  - BranchesController con endpoints GET/POST/PATCH/DELETE /branches protegidos por AuthGuard, RolesGuard y TenantInterceptor.
+  - Auto-sanación en el bucle interno (Inner Loop) resolviendo desacoplamiento de tipos en TenantRequest contra el entorno TypeScript.
+  - Suite de integración multi-tenant.integration.spec.ts pasando al 100% (11/11 tests en verde) y suite unitaria de catálogo pasando al 100% (13/13 tests en verde).
+  - GitFlow: commit convencional d5e92f5 en feature/TASK-07-aislamiento-multi-tenant y merge no-fast-forward a develop.
+  - Mutación inmutable de checkboxes en tasks.md, FASE_TRACKING.md y PLAN_IMPLEMENTACION.md.
+  ```
+- **Acciones de Git:**
+  - Rama feature: `feature/TASK-07-aislamiento-multi-tenant` (creada desde `develop`)
+  - Commit atómico feature: `d5e92f5 feat(catalog): implementar aislamiento multi-tenant con context service, middleware y sucursal service`
+  - Merge a develop: Commit merge no-ff a `develop`
+- **Reporte de pruebas automatizadas:**
+  | Suite / Nivel | Total | ✅ Pasaron | ❌ Fallaron | Cobertura (%) |
+  |---|---|---|---|---|
+  | Integración (multi-tenant.integration) | 11 | 11 | 0 | 100% |
+  | Unitarias (catalog: usuario, categoria, producto, negocio, sucursal) | 13 | 13 | 0 | 100% |
+  | Unitarias de Regresión (auth: service + guard) | 39 | 39 | 0 | 100% |
+  | **Total Verificado** | **63** | **63** | **0** | **100%** |
+- **Lista detallada de pruebas ejecutadas:**
+  - [x] `multi-tenant.integration.spec.ts`: Listado de sucursales restringido al tenant activo sin fuga cross-tenant.
+  - [x] `multi-tenant.integration.spec.ts`: Denegación con NotFoundException si Tenant A intenta consultar por ID una sucursal del Tenant B.
+  - [x] `multi-tenant.integration.spec.ts`: Denegación si Tenant A intenta modificar datos de una sucursal del Tenant B.
+  - [x] `multi-tenant.integration.spec.ts`: Denegación si Tenant A intenta eliminar una sucursal del Tenant B.
+  - [x] `multi-tenant.integration.spec.ts`: TenantMiddleware extrae tenantId desde la cabecera X-Tenant-ID.
+  - [x] `multi-tenant.integration.spec.ts`: TenantMiddleware extrae tenantId desde req.user.negocioId con autenticación JWT.
+  - [x] `multi-tenant.integration.spec.ts`: TenantInterceptor arroja BadRequestException si no existe tenantId en la petición.
+  - [x] `multi-tenant.integration.spec.ts`: TenantInterceptor inyecta tenantId en TenantContextService.
+  - [x] `multi-tenant.integration.spec.ts`: Concurrencia y aislamiento thread-safe con AsyncLocalStorage en ejecuciones asíncronas simultáneas.
+  - [x] `multi-tenant.integration.spec.ts`: NegocioService registra negocio con plan por defecto basico.
+  - [x] `multi-tenant.integration.spec.ts`: NegocioService arroja ConflictException si el NIT/RUT ya existe.
+  - [x] `negocio.service.spec.ts`: Registro con planes básico/pro/enterprise, unicidad de NIT y actualización comercial.
+  - [x] `sucursal.service.spec.ts`: Creación vinculada a tenant, validaciones de nombre, zona horaria y actualización.
+- **Estado de Funcionalidad / Fase:** ⏳ En progreso (Módulo 2.2 Catálogo & Multi-Tenant - TASK-07 completada al 100%, siguiente: TASK-08).
+
+

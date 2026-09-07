@@ -84,11 +84,11 @@ Este documento actúa como el **Quality Gate Oficial** del proyecto. Ninguna fas
   - [x] **Pruebas de Seguridad/Guard:** `Backend/tests/unit/auth/auth.guard.spec.ts`
 
 ### 2.2 Módulo Catálogo & Multi-Tenant
-- [ ] ⏳ **Aislamiento de Negocio y Sucursal**
-  - [ ] Entidades y servicios de Negocio, Sucursal, Usuario
-  - [ ] Filtro y aislamiento multi-tenant por fila (`tenant_id`)
-  - [ ] **Pruebas de Catálogo:** `Backend/tests/unit/catalog/*.spec.ts`
-  - [ ] **Pruebas de Aislamiento:** `Backend/tests/integration/multi-tenant.integration.spec.ts`
+- [x] ✅ **Aislamiento de Negocio y Sucursal**
+  - [x] Entidades y servicios de Negocio, Sucursal, Usuario
+  - [x] Filtro y aislamiento multi-tenant por fila (`tenant_id`)
+  - [x] **Pruebas de Catálogo:** `Backend/tests/unit/catalog/*.spec.ts`
+  - [x] **Pruebas de Aislamiento:** `Backend/tests/integration/multi-tenant.integration.spec.ts`
 
 - [ ] ⏳ **Catálogo de Productos y Categorías**
   - [ ] Categorías con orden de visualización para POS
