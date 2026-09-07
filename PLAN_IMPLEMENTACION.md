@@ -68,7 +68,7 @@ Para asegurar la máxima calidad sin degradar la memoria del agente, cada fase y
 ### 2.5 Módulo de Cortes de Caja y Auditoría
 - [x] **2.5.1 Apertura de Turno con Base Inicial:** Endpoint `/cash-shifts/open` con base de efectivo obligatoria; bloqueo de ventas si la caja está cerrada.
 - [x] **2.5.2 Conciliación de Turno y Cuadre de Caja:** Endpoint `/cash-cuts` con cálculo de diferencia inmutable (`contado - esperado`).
-- [ ] **2.5.3 Ingresos y Egresos de Caja (Gastos Operativos y Materia Prima):** Registro de entradas de efectivo (inyección base, abonos) y egresos de caja (compra de carne/ganado/materia prima, fletes, insumos, hielo, servicios) con 10 categorías operativas, validación de saldo disponible y deducción en cálculo de efectivo esperado en corte.
+- [x] **2.5.3 Ingresos y Egresos de Caja (Gastos Operativos y Materia Prima):** Registro de entradas de efectivo (inyección base, abonos) y egresos de caja (compra de carne/ganado/materia prima, fletes, insumos, hielo, servicios) con 10 categorías operativas, validación de saldo disponible y deducción en cálculo de efectivo esperado en corte.
 
 ### 2.6 Motor de Sincronización Offline-First Idempotente
 - [x] **2.6.1 Endpoint Idempotente `/sales/sync`:** Ingesta de lotes de transacciones generadas offline con UUIDs de cliente evitando duplicidad.

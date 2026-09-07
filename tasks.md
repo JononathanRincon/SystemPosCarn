@@ -92,7 +92,7 @@
   - *Trazabilidad:* EARS-VENTA-01, EARS-VENTA-04, US-04.
   - *Prueba Verificable:* `npm run test -- venta-completa.integration.spec.ts`.
 
-- [ ] **TASK-13B: Movimientos de Caja (Ingresos y Egresos por Materia Prima y Gastos)**
+- [x] **TASK-13B: Movimientos de Caja (Ingresos y Egresos por Materia Prima y Gastos)**
   - *Objetivo:* Implementar entidad `MovimientoCaja`, enums `tipo_movimiento_caja` y `categoria_movimiento_caja`, validación de saldo disponible en efectivo antes de egresos, endpoints `POST /cash-shifts/movements` y `GET /cash-shifts/current/movements`, y actualización del cálculo de `monto_esperado` en `cortes_caja` considerando egresos e ingresos extra.
   - *Trazabilidad:* US-19, EARS-CAJA-02, EARS-CAJA-05, EARS-CAJA-06, EARS-CAJA-07, `design.md` Sec. 2 y 7.5.
   - *Prueba Verificable:* `npm run test -- movimiento-caja.service.spec.ts` y `Backend/tests/integration/movimientos-caja.integration.spec.ts`.

@@ -1161,6 +1161,85 @@ PLANTILLA ESQUELETO PARA NUEVAS ENTRADAS
   - `Backend/src/modules/catalog/application/listeners/catalog-cache.listener.ts`
   - `Backend/tests/unit/catalog/catalog-cache.spec.ts`
 
+---
+
+## Entrada 20 - 2026-09-07 - TASK-13B: Movimientos de Caja (Ingresos y Egresos por Materia Prima y Gastos)
+
+- **Fecha:** 2026-09-07
+- **Modelo/herramienta:** Antigravity (Gemini 3.8 Flash)
+- **Prompt utilizado (completo):**
+  ```text
+  Actúa como Staff Software Engineer bajo el protocolo estricto de AGENTS.md, GitFlow y Loop Engineering.
+  TASK-13B: Movimientos de Caja (Ingresos y Egresos por Materia Prima y Gastos)
+  - Entidad MovimientoCaja con enums TipoMovimientoCaja y CategoriaMovimientoCaja (10 categorías operativas).
+  - Validación de saldo de efectivo disponible (monto <= saldoDisponible) para egresos (EARS-CAJA-07 / Caso Límite 7).
+  - Endpoints: POST /cash-shifts/movements, GET /cash-shifts/current/movements, GET /cash-shifts/:id/movements.
+  - Actualización del cálculo de efectivoEsperado en CorteCaja (apertura + ventas + ingresosExtra - egresos).
+  - Pruebas unitarias e integración al 100% en verde.
+  ```
+- **Output del agente / Respuesta de la herramienta (resumen ejecutivo):**
+  ```text
+  TASK-13B completada con éxito bajo protocolo estricto GitFlow y Loop Engineering:
+  - Entidad de dominio MovimientoCaja creada con enums TipoMovimientoCaja ('ingreso', 'egreso') y CategoriaMovimientoCaja con las 10 categorías operativas de carnicería (compra_materia_prima, flete_transporte, insumos_empaque, hielo_refrigeracion, servicios_mantenimiento, anticipo_nomina, inyeccion_base, abono_fiado, sangria_seguridad, otro).
+  - Validación de invariantes de dominio: monto > 0, justificación/descripción no vacía, trazabilidad de comprobante, beneficiario y dispositivo.
+  - Actualización de entidad CorteCaja:
+    * Nuevos acumuladores inmutables totalIngresosExtra y totalEgresos.
+    * Métodos calcularSaldoDisponible(ventasEfectivo), calcularEfectivoEsperado(ventasEfectivo) y registrarMovimiento(tipo, monto).
+    * Actualización de la fórmula matemática de cuadre: efectivoEsperado = montoApertura + ventasEfectivo + totalIngresosExtra - totalEgresos.
+  - Puerto de repositorio IMovimientoCajaRepository y token MOVIMIENTO_CAJA_REPOSITORY.
+  - DTOs de validación con class-validator: RegistrarMovimientoCajaDto, MovimientoCajaResponseDto, ResumenMovimientosTurnoDto, y actualización de CashShiftResponseDto.
+  - Servicio MovimientoCajaService:
+    * Valida turno abierto existente (NotFoundException / BadRequestException si está cerrado).
+    * Consulta ventas acumuladas en efectivo desde ISalesCashQueryProvider.
+    * Validación estricta de saldo para egresos (EARS-CAJA-07, Caso Límite 7): si monto > saldoDisponible arroja BadRequestException con detalle cuantitativo.
+    * Actualización sincrónica de acumuladores en el turno y persistencia del movimiento.
+    * Endpoints de consulta por dispositivo activo y por ID de corte.
+  - Endpoints HTTP en CashShiftsController:
+    * POST /cash-shifts/movements: registro de ingresos y egresos.
+    * GET /cash-shifts/current/movements: resumen y lista viva del turno actual.
+    * GET /cash-shifts/:id/movements: lista de movimientos por ID de turno.
+  - Soporte de inyección opcional y fallback transparente en CashShiftsController y CashModule sin romper firmas de constructores preexistentes.
+  - Quality Gate 100% en verde:
+    * tests/unit/corte-caja/movimiento-caja.service.spec.ts: 9/9 tests pasando al 100%.
+    * tests/integration/movimientos-caja.integration.spec.ts: 1/1 test de flujo completo pasando al 100%.
+    * Regresión completa de 30 suites y 177 tests pasando al 100% en 28.6s sin ninguna falla ni advertencia.
+  - GitFlow: commit convencional 909b008 en feature/TASK-13B-movimientos-caja-ingresos-egresos y merge no-ff e454cae a develop.
+  - Mutación inmutable de checkboxes en tasks.md, FASE_TRACKING.md y PLAN_IMPLEMENTACION.md.
+  ```
+- **Acciones de Git:**
+  - Rama feature: `feature/TASK-13B-movimientos-caja-ingresos-egresos` (creada desde `develop`)
+  - Commit atómico feature: `909b008 feat(cash): implementar entidad MovimientoCaja, egresos de materia prima, ingresos extra y validacion de saldo`
+  - Merge a develop: `e454cae merge: feature/TASK-13B-movimientos-caja-ingresos-egresos a develop tras 100% tests en verde`
+  - Push remoto: `develop` y `feature/TASK-13B-movimientos-caja-ingresos-egresos` subidos a `origin`
+- **Reporte de pruebas automatizadas:**
+  | Suite / Nivel | Total | ✅ Pasaron | ❌ Fallaron | Cobertura (%) |
+  |---|---|---|---|---|
+  | Unitarias (movimiento-caja.service.spec) | 9 | 9 | 0 | 100% |
+  | Integración (movimientos-caja.integration.spec) | 1 | 1 | 0 | 100% |
+  | Regresión Corte de Caja (service + integration) | 14 | 14 | 0 | 100% |
+  | **Total Backend Completo (30 Suites)** | **177** | **177** | **0** | **100%** |
+- **Lista detallada de pruebas ejecutadas:**
+  - [x] `movimiento-caja.service.spec.ts`: Registro exitoso de egreso para compra_materia_prima con saldo disponible (EARS-CAJA-05).
+  - [x] `movimiento-caja.service.spec.ts`: Rechazo de egreso si el monto supera el saldo disponible en caja (EARS-CAJA-07, Caso Límite 7).
+  - [x] `movimiento-caja.service.spec.ts`: Registro de ingreso extraordinario por inyeccion_base o abono_fiado (EARS-CAJA-06).
+  - [x] `movimiento-caja.service.spec.ts`: Rechazo de movimientos con monto menor o igual a cero.
+  - [x] `movimiento-caja.service.spec.ts`: Rechazo de movimientos con descripción o justificación vacía.
+  - [x] `movimiento-caja.service.spec.ts`: Rechazo de movimientos en turnos cerrados.
+  - [x] `movimiento-caja.service.spec.ts`: Listado de movimientos y balance del turno actual vía obtenerMovimientosTurnoActual.
+  - [x] `movimiento-caja.service.spec.ts`: Consulta de movimientos por corteId.
+  - [x] `movimiento-caja.service.spec.ts`: Reflejo de egresos e ingresos en el cálculo inmutable de efectivoEsperado al cerrar turno.
+  - [x] `movimientos-caja.integration.spec.ts`: Flujo completo end-to-end de caja: Apertura -> Egresos de carne -> Inyecciones de cambio -> Consulta viva -> Cierre con cuadre exacto.
+  - [x] Regresión completa de 30 suites y 177 tests pasando al 100%.
+- **Estado de Funcionalidad / Fase:** ✅ Realizada y Probada (TASK-13B completada al 100% y Bloque 5.5 cerrado).
+- **Qué se generó:**
+  - `Backend/src/modules/cash/domain/entities/movimiento-caja.entity.ts`
+  - `Backend/src/modules/cash/domain/ports/movimiento-caja-repository.port.ts`
+  - `Backend/src/modules/cash/application/dtos/movimiento-caja.dto.ts`
+  - `Backend/src/modules/cash/application/services/movimiento-caja.service.ts`
+  - `Backend/tests/unit/corte-caja/movimiento-caja.service.spec.ts`
+  - `Backend/tests/integration/movimientos-caja.integration.spec.ts`
+
+
 
 
 
