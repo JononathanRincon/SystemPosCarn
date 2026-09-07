@@ -148,6 +148,42 @@ export class TokenService {
   }
 
   /**
+   * Genera un sessionToken para terminal POS de mostrador (design.md sec. 7.1 endpoint 3).
+   * TTL de 12 horas (duración del turno de caja).
+   */
+  async generateSessionToken(payload: {
+    sub: string;
+    email?: string;
+    rol: string;
+    negocioId: string;
+    sucursalId: string | null;
+    dispositivoId?: string;
+  }): Promise<string> {
+    const sessionPayload: TokenPayload & { dispositivoId?: string } = {
+      sub: payload.sub,
+      email: payload.email || '',
+      rol: payload.rol,
+      negocioId: payload.negocioId,
+      sucursalId: payload.sucursalId,
+      dispositivoId: payload.dispositivoId,
+      tokenType: 'access',
+      tokenId: crypto.randomUUID(),
+    };
+
+    return this.jwtService.signAsync(sessionPayload, {
+      secret: this.jwtSecret,
+      expiresIn: 12 * 60 * 60, // 12 horas
+    });
+  }
+
+  /**
+   * Alias genérico para verificar un Access/Session Token.
+   */
+  async verifyToken(token: string): Promise<TokenPayload> {
+    return this.verifyAccessToken(token);
+  }
+
+  /**
    * Configuración de cookie segura para el refresh token (Anthropic Cybersecurity Skill).
    */
   getCookieOptions() {
@@ -160,3 +196,4 @@ export class TokenService {
     };
   }
 }
+

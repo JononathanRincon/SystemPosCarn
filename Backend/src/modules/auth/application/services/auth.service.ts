@@ -4,9 +4,12 @@ import {
   Optional,
   UnauthorizedException,
   BadRequestException,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { HashingService } from './hashing.service';
 import { TokenService } from './token.service';
+import { PinThrottlerService } from './pin-throttler.service';
 import { Usuario } from '../../domain/entities/usuario.entity';
 import {
   UsuarioRepositoryPort,
@@ -17,6 +20,8 @@ import {
   LoginResponseDto,
   RefreshResponseDto,
   AuthTokensDto,
+  PinLoginDto,
+  PinLoginResponseDto,
 } from '../dtos/auth.dto';
 
 export interface LoginResult {
@@ -26,13 +31,32 @@ export interface LoginResult {
 
 @Injectable()
 export class AuthService {
+  private readonly pinThrottlerService: PinThrottlerService;
+  private readonly usuarioRepository?: UsuarioRepositoryPort;
+
   constructor(
     private readonly hashingService: HashingService = new HashingService(),
     private readonly tokenService: TokenService = new TokenService(),
     @Optional()
+    pinThrottlerOrRepo?: PinThrottlerService | UsuarioRepositoryPort,
+    @Optional()
     @Inject(USUARIO_REPOSITORY_PORT)
-    private readonly usuarioRepository?: UsuarioRepositoryPort,
-  ) {}
+    usuarioRepository?: UsuarioRepositoryPort,
+  ) {
+    if (pinThrottlerOrRepo && 'checkLockout' in pinThrottlerOrRepo) {
+      this.pinThrottlerService = pinThrottlerOrRepo as PinThrottlerService;
+      this.usuarioRepository = usuarioRepository;
+    } else if (
+      pinThrottlerOrRepo &&
+      ('findById' in pinThrottlerOrRepo || 'findByEmail' in pinThrottlerOrRepo)
+    ) {
+      this.pinThrottlerService = new PinThrottlerService();
+      this.usuarioRepository = pinThrottlerOrRepo as UsuarioRepositoryPort;
+    } else {
+      this.pinThrottlerService = (pinThrottlerOrRepo as PinThrottlerService) || new PinThrottlerService();
+      this.usuarioRepository = usuarioRepository;
+    }
+  }
 
   /**
    * Hashea una contraseña con bcrypt y factor de costo mínimo 10 (EARS-AUTH-01).
@@ -196,4 +220,98 @@ export class AuthService {
   getTokenService(): TokenService {
     return this.tokenService;
   }
+
+  /**
+   * Expone el servicio de limitación de intentos de PIN.
+   */
+  getPinThrottlerService(): PinThrottlerService {
+    return this.pinThrottlerService;
+  }
+
+  /**
+   * Endpoint de Validación Local de PIN POS y Bloqueo por Intentos Fallidos
+   * (EARS-AUTH-03, EARS-AUTH-04, design.md sec. 7.1 endpoint 3):
+   * - Valida PIN POS de exactamente 4 dígitos contra los usuarios asignados a la sucursal.
+   * - Bloquea el acceso durante 60 segundos si se superan 3 intentos erróneos consecutivos (HTTP 429 Too Many Requests).
+   * - Retorna { valid: true, user: { id, nombre, rol }, sessionToken }.
+   */
+  async pinLogin(dto: PinLoginDto): Promise<PinLoginResponseDto> {
+    if (!dto.pin || !Usuario.isValidPinFormat(dto.pin)) {
+      throw new BadRequestException('El PIN debe tener exactamente 4 dígitos numéricos');
+    }
+
+    const throttleKey = `${dto.sucursalId}:${dto.dispositivoId}`;
+
+    // 1. Validar si el dispositivo se encuentra actualmente bloqueado por fuerza bruta
+    this.pinThrottlerService.checkLockout(throttleKey);
+
+    if (!this.usuarioRepository) {
+      throw new Error('UsuarioRepositoryPort no configurado');
+    }
+
+    let matchingUser: Usuario | null = null;
+
+    if (dto.userId) {
+      const user = await this.usuarioRepository.findById(dto.userId);
+      if (user && user.activo && user.sucursalId === dto.sucursalId) {
+        const isValid = await user.validatePin(dto.pin);
+        if (isValid) {
+          matchingUser = user;
+        }
+      }
+    } else {
+      if (this.usuarioRepository.findBySucursalAndPin) {
+        matchingUser = await this.usuarioRepository.findBySucursalAndPin(dto.sucursalId, dto.pin);
+      } else if (this.usuarioRepository.findBySucursal) {
+        const users = await this.usuarioRepository.findBySucursal(dto.sucursalId);
+        for (const user of users) {
+          if (user.activo && (await user.validatePin(dto.pin))) {
+            matchingUser = user;
+            break;
+          }
+        }
+      }
+    }
+
+    if (!matchingUser) {
+      // Registrar intento fallido
+      const attemptResult = this.pinThrottlerService.recordFailedAttempt(throttleKey);
+      if (attemptResult.isBlocked) {
+        throw new HttpException(
+          {
+            statusCode: HttpStatus.TOO_MANY_REQUESTS,
+            error: 'Too Many Requests',
+            message: `Demasiados intentos fallidos. Acceso bloqueado durante ${attemptResult.remainingSeconds} segundos.`,
+            remainingSeconds: attemptResult.remainingSeconds,
+          },
+          HttpStatus.TOO_MANY_REQUESTS,
+        );
+      }
+      throw new UnauthorizedException('PIN o credenciales inválidas');
+    }
+
+    // Éxito: restablecer intentos fallidos para el dispositivo
+    this.pinThrottlerService.resetAttempts(throttleKey);
+
+    // Emitir session token para la terminal POS (TTL 12h)
+    const sessionToken = await this.tokenService.generateSessionToken({
+      sub: matchingUser.id,
+      email: matchingUser.email,
+      rol: matchingUser.rol,
+      negocioId: matchingUser.negocioId,
+      sucursalId: matchingUser.sucursalId,
+      dispositivoId: dto.dispositivoId,
+    });
+
+    return {
+      valid: true,
+      user: {
+        id: matchingUser.id,
+        nombre: matchingUser.nombreCompleto,
+        rol: matchingUser.rol,
+      },
+      sessionToken,
+    };
+  }
 }
+
