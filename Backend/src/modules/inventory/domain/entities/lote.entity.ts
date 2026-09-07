@@ -166,6 +166,10 @@ export class Lote {
     return cantidadADescontar;
   }
 
+  public estaAgotado(): boolean {
+    return this._estado === 'agotado';
+  }
+
   public toResponseDto(): LoteResponseDto {
     return {
       id: this._id,
