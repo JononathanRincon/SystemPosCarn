@@ -5,14 +5,19 @@ import { SucursalService } from './application/services/sucursal.service';
 import { TenantContextService } from './application/services/tenant-context.service';
 import { TenantMiddleware } from './presentation/middleware/tenant.middleware';
 import { TenantInterceptor } from './presentation/interceptors/tenant.interceptor';
-import { BranchesController } from './presentation/http/branches.controller';
+import { CategoriaService } from './application/services/categoria.service';
+import { ProductoService } from './application/services/producto.service';
+import { CategoriesController } from './presentation/http/categories.controller';
+import { ProductsController } from './presentation/http/products.controller';
 
 @Module({
   imports: [AuthModule],
-  controllers: [BranchesController],
+  controllers: [BranchesController, CategoriesController, ProductsController],
   providers: [
     NegocioService,
     SucursalService,
+    CategoriaService,
+    ProductoService,
     TenantContextService,
     TenantMiddleware,
     TenantInterceptor,
@@ -20,6 +25,8 @@ import { BranchesController } from './presentation/http/branches.controller';
   exports: [
     NegocioService,
     SucursalService,
+    CategoriaService,
+    ProductoService,
     TenantContextService,
     TenantMiddleware,
     TenantInterceptor,
