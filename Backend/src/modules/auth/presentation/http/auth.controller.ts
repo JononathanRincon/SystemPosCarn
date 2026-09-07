@@ -1,0 +1,65 @@
+import {
+  Controller,
+  Post,
+  Body,
+  Res,
+  Req,
+  HttpCode,
+  HttpStatus,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { Response, Request } from 'express';
+import { AuthService } from '../../application/services/auth.service';
+import { LoginDto, RefreshTokenDto, LoginResponseDto, RefreshResponseDto } from '../../application/dtos/auth.dto';
+
+@Controller('auth')
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
+  /**
+   * Endpoint POST /auth/login (design.md sec. 7.1)
+   */
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<LoginResponseDto> {
+    const result = await this.authService.login(loginDto);
+
+    // Configurar cookie segura HttpOnly para el refresh token
+    const cookieOptions = this.authService.getTokenService().getCookieOptions();
+    if (res && typeof res.cookie === 'function') {
+      res.cookie('refreshToken', result.refreshToken, cookieOptions);
+    }
+
+    return result;
+  }
+
+  /**
+   * Endpoint POST /auth/refresh (design.md sec. 7.1)
+   */
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  async refresh(
+    @Body() refreshDto: RefreshTokenDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<RefreshResponseDto> {
+    // Tomar el refresh token desde el body o desde las cookies firmadas
+    const token = refreshDto?.refreshToken || req?.cookies?.refreshToken;
+    if (!token) {
+      throw new UnauthorizedException('Refresh token requerido');
+    }
+
+    const result = await this.authService.refresh(token);
+
+    // Actualizar cookie segura HttpOnly con el nuevo refresh token
+    const cookieOptions = this.authService.getTokenService().getCookieOptions();
+    if (res && typeof res.cookie === 'function') {
+      res.cookie('refreshToken', result.refreshToken, cookieOptions);
+    }
+
+    return result;
+  }
+}

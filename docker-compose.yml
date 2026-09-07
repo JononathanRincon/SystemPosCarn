@@ -1,0 +1,83 @@
+﻿version: '3.8'
+
+services:
+  # ----------------------------------------------------
+  # 1. Base de Datos Cache y Colas de Sincronización
+  # ----------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: pos_carn_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    networks:
+      - pos_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------------------
+  # 2. Backend NestJS (API + Motor de Sync)
+  # ----------------------------------------------------
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: pos_carn_backend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - DIRECT_URL=${DIRECT_URL}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRATION=${JWT_EXPIRATION:-15m}
+    env_file:
+      - ./Backend/.env
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - pos_network
+
+  # ----------------------------------------------------
+  # 3. Frontend Web Next.js (Admin + Web POS)
+  # ----------------------------------------------------
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=http://localhost:3001
+        - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+        - NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY}
+    container_name: pos_carn_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./Frontend/.env.local
+    depends_on:
+      - backend
+    networks:
+      - pos_network
+
+# ----------------------------------------------------
+# Redes y Volúmenes Persistentes
+# ----------------------------------------------------
+networks:
+  pos_network:
+    driver: bridge
+
+volumes:
+  redis_data:
+    driver: local
