@@ -1,4 +1,6 @@
-﻿describe('PagoVentaService (Unitario)', () => {
+﻿import { PagoVenta } from '../../../src/modules/sales/domain/entities/pago-venta.entity';
+
+describe('PagoVentaService (Unitario)', () => {
   it('debe validar que la suma de los pagos coincida con el total de la venta', () => {
     const totalVenta = 47500.0;
     const pagos = [
@@ -13,5 +15,18 @@
     const totalVenta = 50000.0;
     const totalPagado = 40000.0;
     expect(totalPagado).toBeLessThan(totalVenta);
+  });
+
+  it('debe instanciar la entidad PagoVenta con redondeo a 2 decimales y referencia de transacción', () => {
+    const pago = new PagoVenta({
+      ventaId: 'venta-uuid-1',
+      metodo: 'tarjeta',
+      monto: 27500.456,
+      referenciaTransaccion: 'AUTH-998877',
+    });
+
+    expect(pago.monto).toBe(27500.46);
+    expect(pago.metodo).toBe('tarjeta');
+    expect(pago.referenciaTransaccion).toBe('AUTH-998877');
   });
 });
