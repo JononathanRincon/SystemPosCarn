@@ -6,6 +6,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { CreateVentaDto } from '../../../sales/application/dtos/venta.dto';
+import { AlertaStockNegativoDto } from './alerta-stock-negativo.dto';
 
 export class SyncSaleItemDto extends CreateVentaDto {}
 
@@ -24,4 +25,5 @@ export interface SyncResponseDto {
   procesadas: number;
   duplicadasIgnoradas: number;
   errores: string[];
+  alertasStockNegativo?: AlertaStockNegativoDto[];
 }

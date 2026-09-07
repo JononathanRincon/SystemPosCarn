@@ -65,18 +65,38 @@ export class Inventario {
     this._actualizadoEn = new Date();
   }
 
-  public decrementar(cantidad: number): void {
+  public decrementar(cantidad: number, permitirNegativo: boolean = false): void {
     if (cantidad <= 0) {
       throw new Error('La cantidad a decrementar debe ser mayor a cero');
     }
     const cantRedondeada = Number(cantidad.toFixed(3));
-    if (this._cantidadActual < cantRedondeada) {
+    if (!permitirNegativo && this._cantidadActual < cantRedondeada) {
       throw new Error(
         `Stock insuficiente para el producto ${this._productoId}. Disponible: ${this._cantidadActual}, Solicitado: ${cantRedondeada}`
       );
     }
     this._cantidadActual = Number((this._cantidadActual - cantRedondeada).toFixed(3));
     this._actualizadoEn = new Date();
+  }
+
+  /**
+   * EARS-SYNC-05, EARS-INV-01, Caso Límite 3:
+   * Aplica un delta cronológico directo (positivo o negativo).
+   * Permite consolidar deltas offline sin bloquear la venta incluso si el stock resultante queda negativo.
+   */
+  public aplicarDelta(delta: number): void {
+    if (delta === 0) {
+      return;
+    }
+    this._cantidadActual = Number((this._cantidadActual + Number(delta.toFixed(3))).toFixed(3));
+    this._actualizadoEn = new Date();
+  }
+
+  /**
+   * EARS-SYNC-05: Determina si el inventario se encuentra en sobregiro / stock negativo.
+   */
+  public tieneStockNegativo(): boolean {
+    return this._cantidadActual < 0;
   }
 
   public toResponseDto(): InventarioResponseDto {
