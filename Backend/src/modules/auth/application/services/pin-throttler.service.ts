@@ -6,6 +6,25 @@ export interface ThrottlerRecord {
   lastAttemptAt: number;
 }
 
+export class PinLockoutException extends HttpException {
+  public readonly headers: Record<string, string>;
+
+  constructor(public readonly remainingSeconds: number = 60) {
+    super(
+      {
+        statusCode: HttpStatus.TOO_MANY_REQUESTS,
+        error: 'Too Many Requests',
+        message: `Demasiados intentos fallidos. Acceso bloqueado. Intente nuevamente en ${remainingSeconds} segundos.`,
+        remainingSeconds,
+      },
+      HttpStatus.TOO_MANY_REQUESTS,
+    );
+    this.headers = {
+      'Retry-After': String(remainingSeconds),
+    };
+  }
+}
+
 @Injectable()
 export class PinThrottlerService {
   private readonly records = new Map<string, ThrottlerRecord>();
@@ -23,9 +42,9 @@ export class PinThrottlerService {
 
   /**
    * Verifica si una clave (ej: "sucursalId:dispositivoId") se encuentra bloqueada por exceso de intentos fallidos.
-   * Si está bloqueada, arroja una HttpException con status 429 (Too Many Requests).
+   * Si está bloqueada, arroja una HttpException con status 429 (Too Many Requests) y cabecera Retry-After.
    */
-  checkLockout(key: string): void {
+  checkLockout(key: string, res?: any): void {
     const record = this.records.get(key);
     if (!record) return;
 
@@ -34,15 +53,10 @@ export class PinThrottlerService {
     if (record.lockoutUntil) {
       if (now < record.lockoutUntil) {
         const remainingSeconds = Math.max(1, Math.ceil((record.lockoutUntil - now) / 1000));
-        throw new HttpException(
-          {
-            statusCode: HttpStatus.TOO_MANY_REQUESTS,
-            error: 'Too Many Requests',
-            message: `Demasiados intentos fallidos. Acceso bloqueado. Intente nuevamente en ${remainingSeconds} segundos.`,
-            remainingSeconds,
-          },
-          HttpStatus.TOO_MANY_REQUESTS,
-        );
+        if (res && typeof res.setHeader === 'function') {
+          res.setHeader('Retry-After', String(remainingSeconds));
+        }
+        throw new PinLockoutException(remainingSeconds);
       } else {
         // El periodo de bloqueo ha expirado: restablecer el contador
         this.records.delete(key);

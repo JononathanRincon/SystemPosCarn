@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { HashingService } from './hashing.service';
 import { TokenService } from './token.service';
-import { PinThrottlerService } from './pin-throttler.service';
+import { PinThrottlerService, PinLockoutException } from './pin-throttler.service';
 import { Usuario } from '../../domain/entities/usuario.entity';
 import {
   UsuarioRepositoryPort,
@@ -277,15 +277,7 @@ export class AuthService {
       // Registrar intento fallido
       const attemptResult = this.pinThrottlerService.recordFailedAttempt(throttleKey);
       if (attemptResult.isBlocked) {
-        throw new HttpException(
-          {
-            statusCode: HttpStatus.TOO_MANY_REQUESTS,
-            error: 'Too Many Requests',
-            message: `Demasiados intentos fallidos. Acceso bloqueado durante ${attemptResult.remainingSeconds} segundos.`,
-            remainingSeconds: attemptResult.remainingSeconds,
-          },
-          HttpStatus.TOO_MANY_REQUESTS,
-        );
+        throw new PinLockoutException(attemptResult.remainingSeconds);
       }
       throw new UnauthorizedException('PIN o credenciales inválidas');
     }
