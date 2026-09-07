@@ -54,10 +54,10 @@ Para asegurar la máxima calidad sin degradar la memoria del agente, cada fase y
 - [ ] **2.2.4 Cache-Aside de Catálogo en Redis:** Inyección de Redis para lectura rápida del catálogo (TTL 1h) con invalidación reactiva al actualizar precios.
 
 ### 2.3 Módulo de Ventas, Comandas y Facturación ACID
-- [ ] **2.3.1 Creación de Venta Atómica:** Transacción `prisma.$transaction` que congela el snapshot inmutable de precios en `DetalleVenta`.
-- [ ] **2.3.2 Motor de Pagos Múltiples:** Pagos simples y mixtos (efectivo, tarjeta, transferencia, fiado) validando que la suma coincida con el total.
+- [x] **2.3.1 Creación de Venta Atómica:** Transacción `prisma.$transaction` que congela el snapshot inmutable de precios en `DetalleVenta`.
+- [x] **2.3.2 Motor de Pagos Múltiples:** Pagos simples y mixtos (efectivo, tarjeta, transferencia, fiado) validando que la suma coincida con el total.
 - [ ] **2.3.3 Gestión de Clientes y Validación de Cupo Fiado:** Control estricto de crédito (`limite_credito - saldo_fiado`) impidiendo sobregiro.
-- [ ] **2.3.4 Anulación de Venta con Reversión de Stock:** Endpoint `/sales/:id/void` con trazabilidad completa sin borrado físico.
+- [x] **2.3.4 Anulación de Venta con Reversión de Stock:** Endpoint `/sales/:id/void` con trazabilidad completa sin borrado físico.
 
 ### 2.4 Módulo de Inventario por Lote, Mermas y Despacho FEFO
 - [x] **2.4.1 Recepción de Mercancía por Lotes:** Registro de camión/proveedor creando `RecepcionMercancia` y múltiples `Lotes` con fecha de vencimiento y temperatura.

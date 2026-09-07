@@ -87,7 +87,7 @@
   - *Trazabilidad:* EARS-CAJA-02, EARS-CAJA-03, EARS-CAJA-04, US-06.
   - *Prueba Verificable:* `npm run test -- corte-caja.integration.spec.ts`.
 
-- [ ] **TASK-13: Creación de Venta con Snapshot Inmutable de Precios y Pagos Mixtos**
+- [x] **TASK-13: Creación de Venta con Snapshot Inmutable de Precios y Pagos Mixtos**
   - *Objetivo:* Endpoint de creación de venta, validación de total vs pagos y congelación de precio unitario en `DetalleVenta`.
   - *Trazabilidad:* EARS-VENTA-01, EARS-VENTA-04, US-04.
   - *Prueba Verificable:* `npm run test -- venta-completa.integration.spec.ts`.

@@ -681,3 +681,78 @@ PLANTILLA ESQUELETO PARA NUEVAS ENTRADAS
   - [x] `corte-caja.service.spec.ts`: Verificación de estado de caja para bloqueo de transacciones (EARS-CAJA-04).
   - [x] `corte-caja.integration.spec.ts`: Integración de controladores y servicio: flujo completo apertura -> en vivo -> cierre inmutable -> bloqueo de caja.
 - **Estado de Funcionalidad / Fase:** ⏳ En progreso (Bloque 5 / Módulo 2.6 completado al 100%, siguiente: TASK-13 Creación de Venta Atómica con Snapshot Inmutable de Precios y Pagos Mixtos).
+
+---
+
+## Entrada 13
+
+- **Fecha:** 2026-09-07
+- **Modelo/herramienta:** Antigravity (Gemini 3.8 Flash)
+- **Prompt utilizado:**
+  ```text
+  TASK-13: Creación de Venta Atómica con Snapshot Inmutable de Precios y Pagos Mixtos
+  - Rama: feature/TASK-13-venta-snapshot-pagos-mixtos desde develop.
+  - Requisitos: EARS-VENTA-01, EARS-VENTA-03, EARS-VENTA-04, US-04, EARS-CAJA-03, EARS-CAJA-04.
+  - Implementación:
+    1. Transacción atómica ACID (ventas, detalles_venta, pagos_venta con snapshot inmutable de precios).
+    2. Soporte para productos por peso (decimal 10,3) y por unidad.
+    3. Validación estricta de pagos mixtos y saldo faltante si es insuficiente (400 BadRequestException).
+    4. Verificación de turno de caja abierto (bloqueo si está cerrada o sin turno).
+    5. Emisión de evento de dominio VentaCompletadaEvent para desacoplamiento DDD.
+    6. Anulación inmutable de venta (POST /sales/:id/void).
+  - Prueba Verificable: npm run test -- venta-completa.integration.spec.ts (100% verde).
+  ```
+- **Output del agente / Respuesta de la herramienta (resumen ejecutivo):**
+  ```text
+  TASK-13 completada con éxito bajo protocolo estricto GitFlow y Loop Engineering, cerrando el Bloque 5 al 100%:
+  - Entidades de dominio Venta, DetalleVenta y PagoVenta en SalesContext:
+    * Snapshot inmutable de precio unitario congelado al momento del cobro.
+    * Subtotales con precisión al centavo y soporte para pesaje con 3 decimales (kg).
+    * Validación matemática estricta: suma de pagos >= total calculado; rechazo con saldo faltante si es insuficiente.
+  - Evento de dominio VentaCompletadaEvent desacoplado para el módulo de inventario.
+  - Puerto IVentaRepository desacoplado con métodos transaccionales y de consulta temporal.
+  - DTOs CreateVentaDto, CreateDetalleVentaDto, CreatePagoVentaDto y VoidVentaDto con class-validator.
+  - VentaService con lógica integral:
+    * Idempotencia garantizada por UUID generado en terminal POS.
+    * Verificación obligatoria de estado de caja vía CorteCajaService (EARS-CAJA-03, EARS-CAJA-04).
+    * Cálculo inmutable de subtotales, descuentos y totales.
+    * Emisión de evento VentaCompletadaEvent hacia bus de eventos en memoria.
+    * Proveedor de consultas ISalesCashQueryProvider para suministrar ventas en efectivo al corte de caja.
+    * Anulación de ventas sin borrado físico preservando auditoría.
+  - Controlador SalesController (POST /sales, GET /sales/:id, POST /sales/:id/void) protegido con guards de autenticación y roles.
+  - Módulo SalesModule configurado e integrado con CashModule y AuthModule.
+  - Suites unitarias e integración en verde al 100%:
+    * tests/integration/venta-completa.integration.spec.ts: 4 tests pasando.
+    * tests/unit/ventas/venta.service.spec.ts: 8 tests pasando.
+    * tests/unit/ventas/detalle-venta.service.spec.ts: 3 tests pasando.
+    * tests/unit/ventas/pago-venta.service.spec.ts: 3 tests pasando.
+    * Regresión completa de 24 suites y 138 tests pasando al 100%.
+  - GitFlow: commit e9cfcf0 en feature/TASK-13-venta-snapshot-pagos-mixtos y merge no-ff a develop.
+  - Mutación inmutable de checkboxes en tasks.md (Bloque 5 cerrado al 100%), FASE_TRACKING.md y PLAN_IMPLEMENTACION.md.
+  ```
+- **Acciones de Git:**
+  - Rama feature: `feature/TASK-13-venta-snapshot-pagos-mixtos` (creada desde `develop`)
+  - Commit atómico feature: `e9cfcf0 feat(sales): implementar venta atómica con snapshot inmutable de precios y pagos mixtos`
+  - Merge a develop: Merge no-ff a `develop`
+- **Reporte de pruebas automatizadas:**
+  | Suite / Nivel | Total | ✅ Pasaron | ❌ Fallaron | Cobertura (%) |
+  |---|---|---|---|---|
+  | Integración (venta-completa.integration) | 4 | 4 | 0 | 100% |
+  | Unitarias (venta.service) | 8 | 8 | 0 | 100% |
+  | Unitarias (detalle-venta.service) | 3 | 3 | 0 | 100% |
+  | Unitarias (pago-venta.service) | 3 | 3 | 0 | 100% |
+  | Unitarias (corte-caja.service) | 11 | 11 | 0 | 100% |
+  | Integración (corte-caja.integration) | 3 | 3 | 0 | 100% |
+  | **Total Backend Completo (24 Suites)** | **138** | **138** | **0** | **100%** |
+- **Lista detallada de pruebas ejecutadas:**
+  - [x] `venta.service.spec.ts`: Creación de venta con snapshot inmutable de precios y pagos mixtos (EARS-VENTA-01, US-04).
+  - [x] `venta.service.spec.ts`: Rechazo con saldo faltante si los pagos son insuficientes (EARS-VENTA-04).
+  - [x] `venta.service.spec.ts`: Rechazo de venta si la caja está cerrada o sin turno (EARS-CAJA-03, EARS-CAJA-04).
+  - [x] `venta.service.spec.ts`: Idempotencia estricta ante UUID duplicado.
+  - [x] `venta.service.spec.ts`: Emisión de evento VentaCompletadaEvent.
+  - [x] `venta.service.spec.ts`: Anulación de venta sin borrado físico.
+  - [x] `detalle-venta.service.spec.ts`: Captura de snapshot inmutable y peso bruto/neto.
+  - [x] `pago-venta.service.spec.ts`: Validación de suma de pagos vs total y referencias de voucher.
+  - [x] `venta-completa.integration.spec.ts`: Integración completa de flujo de venta, congelación de precios, pesaje de 3 decimales, pagos mixtos, impacto en turno de caja y reversión por anulación.
+- **Estado de Funcionalidad / Fase:** ✅ Realizada y Probada (Bloque 5 / Módulo 2.3 & 2.6 Ventas, Pagos y Turnos de Caja completado al 100%, siguiente: Bloque 6 / Módulo 2.5 Sincronización Offline-First).
+

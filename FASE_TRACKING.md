@@ -96,17 +96,17 @@ Este documento actúa como el **Quality Gate Oficial** del proyecto. Ninguna fas
   - [x] **Pruebas de Producto:** `Backend/tests/unit/catalog/producto.service.spec.ts`
 
 ### 2.3 Módulo Ventas & Pagos (Core POS Móvil y Web)
-- [ ] ⏳ **Registro de Venta y Detalle**
-  - [ ] Creación de venta con UUID generado en terminal (Tablet, Celular o Web POS)
-  - [ ] Snapshot inmutable de precios en `DetalleVenta`
-  - [ ] Cálculo de subtotal, descuentos y total
-  - [ ] **Pruebas Unitarias de Venta:** `Backend/tests/unit/ventas/venta.service.spec.ts`
-  - [ ] **Pruebas de Detalle:** `Backend/tests/unit/ventas/detalle-venta.service.spec.ts`
+- [x] ✅ **Registro de Venta y Detalle**
+  - [x] Creación de venta con UUID generado en terminal (Tablet, Celular o Web POS)
+  - [x] Snapshot inmutable de precios en `DetalleVenta`
+  - [x] Cálculo de subtotal, descuentos y total
+  - [x] **Pruebas Unitarias de Venta:** `Backend/tests/unit/ventas/venta.service.spec.ts`
+  - [x] **Pruebas de Detalle:** `Backend/tests/unit/ventas/detalle-venta.service.spec.ts`
 
-- [ ] ⏳ **Procesamiento de Pagos**
-  - [ ] Pago en efectivo con cálculo de cambio
-  - [ ] Pagos mixtos (efectivo + tarjeta sumando total exacto)
-  - [ ] **Pruebas de Pago:** `Backend/tests/unit/ventas/pago-venta.service.spec.ts`
+- [x] ✅ **Procesamiento de Pagos**
+  - [x] Pago en efectivo con cálculo de cambio
+  - [x] Pagos mixtos (efectivo + tarjeta sumando total exacto)
+  - [x] **Pruebas de Pago:** `Backend/tests/unit/ventas/pago-venta.service.spec.ts`
 
 ### 2.4 Módulo Inventario & Mermas
 - [x] ✅ **Control de Stock por Deltas**
