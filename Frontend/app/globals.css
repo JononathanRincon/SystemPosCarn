@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   POS Carnicería — Estilos Globales
+   ============================================ */
+
+@layer base {
+  :root {
+    --color-carmin-500: #dc2626;
+    --color-carmin-700: #991b1b;
+    --color-ambar-500: #f59e0b;
+    --color-neutro-50: #fafafa;
+    --color-neutro-900: #171717;
+  }
+
+  html {
+    @apply antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-neutro-50 text-neutro-900 font-sans;
+  }
+
+  /* Prevenir zoom accidental en inputs táctiles en iOS / Android */
+  input[type="text"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="password"],
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+@layer components {
+  /* Botón POS primario — mínimo 48px táctil */
+  .btn-pos {
+    @apply inline-flex items-center justify-center
+           min-h-touch min-w-touch
+           px-4 py-3
+           rounded-xl
+           font-semibold text-pos-base
+           transition-colors duration-150
+           focus:outline-none focus:ring-2 focus:ring-offset-2
+           active:scale-[0.98];
+  }
+
+  .btn-pos-primary {
+    @apply btn-pos bg-carmin-500 text-white
+           hover:bg-carmin-700
+           focus:ring-carmin-500;
+  }
+
+  .btn-pos-secondary {
+    @apply btn-pos bg-neutro-200 text-neutro-800
+           hover:bg-neutro-300
+           focus:ring-neutro-400;
+  }
+
+  .btn-pos-danger {
+    @apply btn-pos bg-red-600 text-white
+           hover:bg-red-800
+           focus:ring-red-500;
+  }
+
+  /* Card de producto en grid táctil */
+  .product-card {
+    @apply flex flex-col items-center justify-center
+           min-h-touch-lg
+           p-4 rounded-2xl
+           bg-white border border-neutro-200
+           shadow-sm
+           transition-all duration-150
+           hover:shadow-md hover:border-carmin-300
+           active:scale-[0.97] active:shadow-inner
+           cursor-pointer select-none;
+  }
+}
