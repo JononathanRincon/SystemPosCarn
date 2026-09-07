@@ -74,7 +74,7 @@ Para asegurar la máxima calidad sin degradar la memoria del agente, cada fase y
 - [x] **2.6.1 Endpoint Idempotente `/sales/sync`:** Ingesta de lotes de transacciones generadas offline con UUIDs de cliente evitando duplicidad.
 - [ ] **2.6.2 Cola Asíncrona con BullMQ:** Amortiguación de ráfagas masivas de sincronización respondiendo HTTP 202 a los terminales.
 - [ ] **2.6.3 Descarga de Catálogo Incremental (`/catalog/sync`):** Descarga de deltas por sync token temporal.
-- [ ] **2.6.4 Resolución Concurrente de Inventario y Alertas Negativas:** Aplicación determinista de deltas sin bloquear cajas.
+- [x] **2.6.4 Resolución Concurrente de Inventario y Alertas Negativas:** Aplicación determinista de deltas sin bloquear cajas.
 
 ### 2.7 Módulo de Observabilidad y API de Dashboards
 - [ ] **2.7.1 Logs Canónicos y Correlation IDs:** Middleware de `pino-http` inyectando `X-Correlation-ID` en cada petición y log JSON.

@@ -101,7 +101,7 @@
   - *Trazabilidad:* EARS-SYNC-01, EARS-SYNC-04, US-05.
   - *Prueba Verificable:* `npm run test -- sync-offline.integration.spec.ts`.
 
-- [ ] **TASK-15: Manejo de Concurrencia de Inventario y Alertas de Stock Negativo**
+- [x] **TASK-15: Manejo de Concurrencia de Inventario y Alertas de Stock Negativo**
   - *Objetivo:* Aplicar deltas concurrentes y emitir alerta si el stock consolidado queda en negativo sin bloquear la venta.
   - *Trazabilidad:* EARS-SYNC-05, PA-02.
   - *Prueba Verificable:* `npm run test -- sync-conflicto.integration.spec.ts`.

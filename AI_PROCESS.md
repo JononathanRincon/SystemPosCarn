@@ -812,3 +812,70 @@ PLANTILLA ESQUELETO PARA NUEVAS ENTRADAS
   - [x] `sync-offline.integration.spec.ts`: Integración de SyncController y SyncService verificando contratos HTTP y respuestas por lote.
 - **Estado de Funcionalidad / Fase:** ⏳ En progreso (TASK-14 completada, siguiente: TASK-15 Manejo de Concurrencia de Inventario y Alertas de Stock Negativo).
 
+---
+
+## Entrada 15
+
+- **Fecha:** 2026-09-07
+- **Modelo/herramienta:** Antigravity (Gemini 3.8 Flash)
+- **Prompt utilizado:**
+  ```text
+  TASK-15: Manejo de Concurrencia de Inventario y Alertas de Stock Negativo
+  - Rama: feature/TASK-15-concurrencia-inventario-stock-negativo desde develop.
+  - Requisitos: EARS-SYNC-05, PA-02, Caso Límite 3.
+  - Implementación:
+    1. Servicio ConflictoService con aplicación determinista de deltas cronológicos concurrentes.
+    2. Integración de ConflictoService en SyncService (POST /sales/sync).
+    3. Si el stock consolidado resultante queda < 0:
+       - No bloquear ni anular la venta efectuada físicamente en offline.
+       - Persistir delta negativo en MovimientoInventario con trazabilidad.
+       - Actualizar inventario con el sobregiro.
+       - Emitir AlertaStockNegativoEvent hacia bus de eventos y notificar en la respuesta batch.
+    4. Soporte en entidad Inventario (aplicarDelta, tieneStockNegativo, decrementar con permitirNegativo).
+  - Prueba Verificable: npm run test -- sync-conflicto.integration.spec.ts (100% verde).
+  ```
+- **Output del agente / Respuesta de la herramienta (resumen ejecutivo):**
+  ```text
+  TASK-15 completada con éxito bajo protocolo estricto GitFlow y Loop Engineering, cerrando el Bloque 6 al 100%:
+  - Entidad Inventario actualizada:
+    * Método aplicarDelta(delta: number) para consolidación directa de deltas cronológicos offline.
+    * Método tieneStockNegativo(): boolean para auditoría instantánea de sobregiros.
+    * decrementar(cantidad, permitirNegativo = false) permitiendo flexibilidad entre modo en vivo estricto y concurrencia offline resiliente.
+  - DTOs y Eventos de dominio:
+    * AlertaStockNegativoDto: tipado exhaustivo con severidad ('alta' vs 'critica' para sobregiros > 10 kg), deltaAplicado, stockResultante, dispositivoId, ventaId y mensaje canónico.
+    * AlertaStockNegativoEvent: desacoplamiento de inventario y alertas mediante DDD.
+  - Servicio ConflictoService:
+    * Inyección opcional de repositorios IInventarioRepository e IMovimientoRepository y emisor de eventos IDomainEventEmitter.
+    * Método aplicarDeltasVentaOffline: aplica deltas negativos de cada item de la venta offline, crea registros inmutables en MovimientoInventario de auditoría y emite alertas prioritarias si el stock resultante < 0 sin abortar la venta.
+    * Métodos de consulta y gestión en memoria para soporte multi-entorno y testing.
+  - Integración en SyncService y SyncModule:
+    * Procesamiento concurrente en loop de sincronización por lotes sin bloquear ventas duplicadas o concurrentes.
+    * SyncResponseDto enriquecido con arreglo opcional alertasStockNegativo.
+  - Suites de pruebas automatizadas al 100% en verde:
+    * tests/unit/sync/conflicto.service.spec.ts: 4 tests exhaustivos pasando.
+    * tests/integration/sync-conflicto.integration.spec.ts: simulación multi-caja completa con 2 terminales offline concurrentes consumiendo inventario compartido hasta generar sobregiro y alerta.
+    * Regresión completa de 24 suites y 146 tests pasando al 100%.
+  - GitFlow: commit 8343085 en feature/TASK-15-concurrencia-inventario-stock-negativo y merge no-ff a develop.
+  - Mutación inmutable de checkboxes en tasks.md (Bloque 6 cerrado al 100%), FASE_TRACKING.md y PLAN_IMPLEMENTACION.md.
+  ```
+- **Acciones de Git:**
+  - Rama feature: `feature/TASK-15-concurrencia-inventario-stock-negativo` (creada desde `develop`)
+  - Commit atómico feature: `8343085 feat(sync): aplicar deltas concurrentes con generacion de alertas de stock negativo sin bloquear venta`
+  - Merge a develop: Merge no-ff a `develop`
+- **Reporte de pruebas automatizadas:**
+  | Suite / Nivel | Total | ✅ Pasaron | ❌ Fallaron | Cobertura (%) |
+  |---|---|---|---|---|
+  | Unitarias (conflicto.service) | 4 | 4 | 0 | 100% |
+  | Integración (sync-conflicto.integration) | 1 | 1 | 0 | 100% |
+  | Unitarias (sync.service) | 6 | 6 | 0 | 100% |
+  | Integración (sync-offline.integration) | 3 | 3 | 0 | 100% |
+  | **Total Backend Completo (24 Suites)** | **146** | **146** | **0** | **100%** |
+- **Lista detallada de pruebas ejecutadas:**
+  - [x] `conflicto.service.spec.ts`: Aplicación de deltas cronológicos concurrentes de dos cajas sin pisar existencias (EARS-SYNC-05, PA-02).
+  - [x] `conflicto.service.spec.ts`: Generación de alerta de stock negativo sin bloquear venta ante sobregiro de inventario (Caso Límite 3).
+  - [x] `conflicto.service.spec.ts`: Clasificación de severidad 'critica' para sobregiros superiores a -10.0 kg.
+  - [x] `conflicto.service.spec.ts`: Filtrado de alertas de stock negativo por sucursal.
+  - [x] `sync-conflicto.integration.spec.ts`: Flujo completo multi-caja vía SyncController con persistencia transaccional y reporte de alerta en la respuesta batch HTTP.
+  - [x] Regresión completa de 24 suites y 146 tests pasando al 100%.
+- **Estado de Funcionalidad / Fase:** ✅ Realizada y Probada (Bloque 6 / Módulo 2.5 Sincronización Offline-First completado al 100%, siguiente: Bloque 7 / Módulo 2.8 Dashboards y Analítica).
+
