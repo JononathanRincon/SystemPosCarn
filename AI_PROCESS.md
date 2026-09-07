@@ -879,3 +879,56 @@ PLANTILLA ESQUELETO PARA NUEVAS ENTRADAS
   - [x] Regresión completa de 24 suites y 146 tests pasando al 100%.
 - **Estado de Funcionalidad / Fase:** ✅ Realizada y Probada (Bloque 6 / Módulo 2.5 Sincronización Offline-First completado al 100%, siguiente: Bloque 7 / Módulo 2.8 Dashboards y Analítica).
 
+---
+
+## Entrada 16
+
+- **Fecha:** 2026-09-07
+- **Modelo/herramienta:** Antigravity (Gemini 3.8 Flash)
+- **Prompt utilizado (completo):**
+  ```text
+  okey añade esa funcionalidad a todos los archivos .md hasta al archivo sdd donde se vea los ingresos e egresos y donde se explique o se coloque valores de que son esos egresos, realice un proceso de analisis de sistema, analiza la base de datos, y tablas creadas si toca crear nueva tabla o campos, realiza un excelente diseñe y complete y añada esa informacion en todos los documentos
+  ```
+- **Output del agente / Respuesta de la herramienta (resumen ejecutivo):**
+  ```text
+  Análisis y Especificación de Sistema para Ingresos y Egresos de Caja completado e integrado en toda la arquitectura documental:
+  1. Análisis de Sistema y Dominio:
+     - Detectada la brecha crítica en carnicerías: pagos en efectivo a proveedores de carne/ganado/cerdo/pollo, insumos y fletes directamente desde la gaveta de la caja registradora generaban falsos faltantes en el arqueo final.
+     - Diseñada la entidad `MovimientoCaja` con tipos ('ingreso', 'egreso') y 10 categorías operativas:
+       * Egresos: compra_materia_prima, flete_transporte, insumos_empaque, hielo_refrigeracion, servicios_mantenimiento, anticipo_nomina, sangria_seguridad, otro.
+       * Ingresos: inyeccion_base, abono_fiado, otro.
+     - Enriquecida la entidad `CorteDeCaja` con acumuladores `total_ingresos_extra` y `total_egresos`.
+     - Fórmula determinista actualizada: Efectivo Esperado = Monto Apertura + Ventas Efectivo + Total Ingresos Extra - Total Egresos.
+     - Regla de negocio de bloqueo EARS-CAJA-07: Prohibir egresos si monto > efectivo disponible actual.
+  2. Actualización de Documentos del Harness y SDD:
+     - SDD_POS_Carniceria.md: Secciones 6.2 (CorteDeCaja y MovimientoCaja), 6.5 (Relaciones), 6.6 (ERD Mermaid), 6.7 (Offline Sync), 7 (Endpoints 25, 26 y 27), 8.1 (US-19) y 9.5 (EARS-CAJA-01 a 07).
+     - requirements.md: US-19, EARS-CAJA-02, EARS-CAJA-05, EARS-CAJA-06, EARS-CAJA-07, y Edge Case 7.
+     - design.md: Tablas SQL en Sección 2 (`cortes_caja` y `movimientos_caja`), enums, y contratos API en Sección 7.5.
+     - tasks.md: TASK-13B añadida con trazabilidad y pruebas verificables.
+     - FASE_TRACKING.md: Sección 1.8 actualizada a 27 endpoints y Sección 2.6 ampliada con sub-módulo de ingresos/egresos.
+     - PLAN_IMPLEMENTACION.md: Sección 2.5.3 enriquecida con categorías operativas y compras de materia prima.
+  3. Verificación de Calidad:
+     - Suite completa de Backend ejecutada: 24/24 suites pasando, 146/146 tests en verde (100%).
+     - Git commit en develop y push exitoso a GitHub origin/develop.
+  ```
+- **Acciones de Git:**
+  - Rama: `develop`
+  - Commits: `174bfcb docs(caja): integrar especificacion de ingresos y egresos de caja por materia prima y gastos en documentacion tecnica`
+  - Push a remoto: `origin develop` sincronizado con éxito
+- **Reporte de pruebas automatizadas:**
+  | Suite / Nivel | Total | ✅ Pasaron | ❌ Fallaron | Cobertura (%) |
+  |---|---|---|---|---|
+  | Backend Completo (24 Suites) | 146 | 146 | 0 | 100% |
+- **Lista detallada de pruebas ejecutadas:**
+  - [x] Regresión completa de 24 suites de pruebas unitarias e integración en verde sin fallos.
+- **Estado de Funcionalidad / Fase:** ⏳ En progreso (Especificación arquitectónica y documental completada al 100%, lista para implementar TASK-13B en código).
+- **Qué se generó:**
+  - `SDD_POS_Carniceria.md` (Actualizado con `MovimientoCaja`, ERD, APIs 25-27, US-19, EARS-CAJA-05 a 07)
+  - `requirements.md` (Actualizado con US-19, EARS-CAJA-05 a 07 y Caso Límite 7)
+  - `design.md` (Actualizado con DDL `movimientos_caja`, alter de `cortes_caja`, enums y contratos REST)
+  - `tasks.md` (Actualizado con `TASK-13B`)
+  - `FASE_TRACKING.md` (Actualizado con 27 endpoints y sub-módulo de movimientos)
+  - `PLAN_IMPLEMENTACION.md` (Actualizado en 2.5.3)
+  - `AI_PROCESS.md` (Entrada 16 auditada)
+
+
