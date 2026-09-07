@@ -4,6 +4,7 @@ import {
   Optional,
   NotFoundException,
 } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 import {
   DashboardOwnerResponseDto,
   MetricasVentasOwnerDto,
@@ -19,6 +20,7 @@ import {
 } from '../dtos/dashboard-manager.dto';
 import { IVentaRepository, VENTA_REPOSITORY } from '../../../sales/domain/ports/venta-repository.port';
 import { Venta } from '../../../sales/domain/entities/venta.entity';
+import { VentaCompletadaEvent } from '../../../sales/domain/events/venta-completada.event';
 import { SucursalRepositoryPort, SUCURSAL_REPOSITORY_PORT } from '../../../catalog/domain/ports/sucursal-repository.port';
 import { ProductoRepositoryPort, PRODUCTO_REPOSITORY_PORT } from '../../../catalog/domain/ports/producto-repository.port';
 import { InventarioService } from '../../../inventory/application/services/inventario.service';
@@ -54,6 +56,15 @@ export class DashboardService {
    */
   public registrarSyncEvent(timestamp: Date = new Date()): void {
     this.ultimaSincronizacionServidor = timestamp;
+  }
+
+  /**
+   * design.md Sec. 8:
+   * DashboardModule escucha VentaCompletadaEvent e invalida / refresca syncTimestamp
+   */
+  @OnEvent(VentaCompletadaEvent.EVENT_NAME, { async: true })
+  handleVentaCompletadaEvent(event: VentaCompletadaEvent): void {
+    this.registrarSyncEvent(event.timestamp || new Date());
   }
 
   public agregarVentaEnMemoria(venta: Venta): void {

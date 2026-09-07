@@ -4,6 +4,7 @@ import {
   Optional,
   BadRequestException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SyncSalesBatchDto, SyncResponseDto, SyncSaleItemDto } from '../dtos/sync.dto';
 import { AlertaStockNegativoDto } from '../dtos/alerta-stock-negativo.dto';
 import { ConflictoService } from './conflicto.service';
@@ -19,6 +20,8 @@ export class SyncService {
     private readonly ventaRepo?: IVentaRepository,
     @Optional()
     private readonly conflictoService?: ConflictoService,
+    @Optional()
+    private readonly eventEmitter?: EventEmitter2,
   ) {}
 
   /**

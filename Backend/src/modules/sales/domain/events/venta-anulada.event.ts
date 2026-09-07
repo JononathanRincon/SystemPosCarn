@@ -15,5 +15,10 @@ export class VentaAnuladaEvent {
     public readonly usuarioId: string,
     public readonly detalles: DetalleVentaAnulada[],
     public readonly timestamp: Date = new Date(),
+    public readonly tenantId?: string,
   ) {}
+
+  get itemsRevertidos(): DetalleVentaAnulada[] {
+    return this.detalles;
+  }
 }
