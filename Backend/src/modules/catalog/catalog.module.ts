@@ -1,5 +1,7 @@
 import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
+import { CacheModule } from '../../common/cache/cache.module';
+import { EventsModule } from '../../common/events/events.module';
 import { NegocioService } from './application/services/negocio.service';
 import { SucursalService } from './application/services/sucursal.service';
 import { TenantContextService } from './application/services/tenant-context.service';
@@ -7,11 +9,13 @@ import { TenantMiddleware } from './presentation/middleware/tenant.middleware';
 import { TenantInterceptor } from './presentation/interceptors/tenant.interceptor';
 import { CategoriaService } from './application/services/categoria.service';
 import { ProductoService } from './application/services/producto.service';
+import { CatalogCacheListener } from './application/listeners/catalog-cache.listener';
+import { BranchesController } from './presentation/http/branches.controller';
 import { CategoriesController } from './presentation/http/categories.controller';
 import { ProductsController } from './presentation/http/products.controller';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, CacheModule, EventsModule],
   controllers: [BranchesController, CategoriesController, ProductsController],
   providers: [
     NegocioService,
@@ -21,6 +25,7 @@ import { ProductsController } from './presentation/http/products.controller';
     TenantContextService,
     TenantMiddleware,
     TenantInterceptor,
+    CatalogCacheListener,
   ],
   exports: [
     NegocioService,
@@ -30,6 +35,8 @@ import { ProductsController } from './presentation/http/products.controller';
     TenantContextService,
     TenantMiddleware,
     TenantInterceptor,
+    CatalogCacheListener,
+    CacheModule,
   ],
 })
 export class CatalogModule implements NestModule {

@@ -74,6 +74,26 @@ export class ProductsController {
   }
 
   /**
+   * Endpoint PATCH /products/:id/price (US-11: Actualización de precio con distribución automática)
+   */
+  @Patch(':id/price')
+  @Roles('Administrador', 'Dueño')
+  async changePrice(
+    @Param('id') id: string,
+    @Body() body: { precio: number },
+  ): Promise<ProductoResponseDto> {
+    return this.productoService.cambiarPrecio(id, body);
+  }
+
+  /**
+   * Endpoint GET /products/branch/:branchId (design.md sec. 1.3: Cache-Aside de catálogo por sucursal)
+   */
+  @Get('branch/:branchId')
+  async getCatalogByBranch(@Param('branchId') branchId: string) {
+    return this.productoService.obtenerCatalogoPorSucursal(branchId);
+  }
+
+  /**
    * Endpoint DELETE /products/:id
    */
   @Delete(':id')

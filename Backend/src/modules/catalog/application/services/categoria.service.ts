@@ -4,6 +4,7 @@ import {
   Optional,
   NotFoundException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import * as crypto from 'crypto';
 import { Categoria, CategoriaResponseDto } from '../../domain/entities/categoria.entity';
 import {
@@ -12,6 +13,8 @@ import {
 } from '../../domain/ports/categoria-repository.port';
 import { TenantContextService } from './tenant-context.service';
 import { CreateCategoriaDto, UpdateCategoriaDto } from '../dtos/categoria.dto';
+import { RedisCacheService } from '../../../../common/cache/redis-cache.service';
+import { CatalogoModificadoEvent } from '../../domain/events/catalogo-modificado.event';
 
 @Injectable()
 export class CategoriaService {
@@ -21,6 +24,10 @@ export class CategoriaService {
     private readonly categoriaRepository?: CategoriaRepositoryPort,
     @Optional()
     private readonly tenantContextService: TenantContextService = new TenantContextService(),
+    @Optional()
+    private readonly cacheService?: RedisCacheService,
+    @Optional()
+    private readonly eventEmitter?: EventEmitter2,
   ) {}
 
   /**
@@ -41,6 +48,7 @@ export class CategoriaService {
     });
 
     const guardada = await this.categoriaRepository.save(nuevaCategoria);
+    await this.invalidarCache(tenantId, guardada.id);
     return guardada.toResponseDto();
   }
 
@@ -100,6 +108,7 @@ export class CategoriaService {
     });
 
     const guardada = await this.categoriaRepository.save(categoria);
+    await this.invalidarCache(tenantId, guardada.id);
     return guardada.toResponseDto();
   }
 
@@ -112,6 +121,27 @@ export class CategoriaService {
     }
 
     const tenantId = tenantIdOverride || this.tenantContextService.getRequiredTenantId();
-    return this.categoriaRepository.delete(id, tenantId);
+    const eliminado = await this.categoriaRepository.delete(id, tenantId);
+    if (eliminado) {
+      await this.invalidarCache(tenantId, id);
+    }
+    return eliminado;
+  }
+
+  private async invalidarCache(tenantId: string, categoriaId: string): Promise<void> {
+    if (this.cacheService) {
+      try {
+        await this.cacheService.delPattern('catalog:sucursal:*');
+      } catch {
+        // Resiliencia
+      }
+    }
+
+    if (this.eventEmitter) {
+      this.eventEmitter.emit(
+        CatalogoModificadoEvent.EVENT_NAME,
+        new CatalogoModificadoEvent(tenantId, categoriaId, 'categoria'),
+      );
+    }
   }
 }
