@@ -1,4 +1,4 @@
-﻿import {
+import {
   Injectable,
   Inject,
   Optional,
@@ -55,8 +55,9 @@ export class VentaService implements ISalesCashQueryProvider {
     }
 
     // 2. Verificación de turno de caja (EARS-CAJA-03, EARS-CAJA-04):
-    // La venta se bloquea si la terminal no tiene un turno abierto activo.
-    if (this.corteCajaService) {
+    // La venta en vivo se bloquea si la terminal no tiene un turno abierto activo.
+    // Las ventas offline (esOffline === true o sincronizada === false) ya se realizaron físicamente y no se bloquean en sincronización.
+    if (this.corteCajaService && !dto.esOffline && dto.sincronizada !== false) {
       const cajaAbierta = await this.corteCajaService.verificarCajaAbierta(dto.dispositivoId);
       if (!cajaAbierta) {
         throw new BadRequestException(
@@ -153,7 +154,7 @@ export class VentaService implements ISalesCashQueryProvider {
       estado: 'completada',
       fechaHoraDispositivo: new Date(dto.fechaHoraDispositivo),
       fechaHoraServidor: new Date(),
-      sincronizada: dto.sincronizada !== undefined ? dto.sincronizada : true,
+      sincronizada: dto.esOffline ? true : (dto.sincronizada !== undefined ? dto.sincronizada : true),
       detalles: detallesEntidad,
       pagos: pagosEntidad,
     });

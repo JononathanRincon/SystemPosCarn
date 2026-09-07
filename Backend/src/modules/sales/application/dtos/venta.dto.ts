@@ -1,4 +1,4 @@
-﻿import {
+import {
   IsArray,
   IsNotEmpty,
   IsNumber,
@@ -94,6 +94,9 @@ export class CreateVentaDto {
 
   @IsOptional()
   sincronizada?: boolean;
+
+  @IsOptional()
+  esOffline?: boolean;
 
   @IsArray({ message: 'detalles debe ser un arreglo de items vendidos' })
   @ValidateNested({ each: true })
