@@ -153,9 +153,9 @@ export class FefoDispatchService {
     );
 
     if (inventario) {
-      // Si se permite stock negativo y no hay suficiente, decrementar lo que se pueda o la cantidad total
+      // EARS-SYNC-05, Caso Límite 3: Si se permite stock negativo (offline / concurrencia), decrementar directamente
       try {
-        inventario.decrementar(cantidadSolicitada);
+        inventario.decrementar(cantidadSolicitada, !!input.permitirStockNegativo);
       } catch (err) {
         if (!input.permitirStockNegativo) {
           throw err;
