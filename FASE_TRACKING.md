@@ -109,14 +109,14 @@ Este documento actúa como el **Quality Gate Oficial** del proyecto. Ninguna fas
   - [ ] **Pruebas de Pago:** `Backend/tests/unit/ventas/pago-venta.service.spec.ts`
 
 ### 2.4 Módulo Inventario & Mermas
-- [ ] ⏳ **Control de Stock por Deltas**
-  - [ ] Tabla de `MovimientoInventario` con deltas (`+` / `-`)
-  - [ ] Descuento automático de stock tras venta
-  - [ ] Registro de mermas (corte, vencimiento, merma operativa)
-  - [ ] Alertas de stock mínimo por sucursal
+- [x] ✅ **Control de Stock por Deltas**
+  - [x] Tabla de `MovimientoInventario` con deltas (`+` / `-`)
+  - [x] Descuento automático de stock tras venta
+  - [x] Registro de mermas (corte, vencimiento, merma operativa)
+  - [x] Alertas de stock mínimo por sucursal
   - [x] **Pruebas de Inventario:** `Backend/tests/unit/inventario/inventario.service.spec.ts`
-  - [ ] **Pruebas de Movimientos:** `Backend/tests/unit/inventario/movimiento.service.spec.ts`
-  - [ ] **Pruebas de Merma:** `Backend/tests/unit/inventario/merma.service.spec.ts`
+  - [x] **Pruebas de Movimientos:** `Backend/tests/unit/inventario/movimiento.service.spec.ts`
+  - [x] **Pruebas de Merma:** `Backend/tests/unit/inventario/merma.service.spec.ts`
 
 ### 2.5 Módulo Sincronización Offline-First
 - [ ] ⏳ **Motor de Sincronización Idempotente (Móvil y Web PWA)**
@@ -136,7 +136,7 @@ Este documento actúa como el **Quality Gate Oficial** del proyecto. Ninguna fas
   - [ ] **Prueba de Integración de Flujo de Caja:** `Backend/tests/integration/corte-caja.integration.spec.ts`
 
 ### 2.7 Módulo Lotes & Recepciones de Mercancía
-- [ ] ⏳ **Inventario por Lote (FEFO)**
+- [x] ✅ **Inventario por Lote (FEFO)**
   - [x] Entidad `Lote` implementada con campos completos
   - [x] Entidad `RecepcionMercancia` implementada
   - [x] Lógica FEFO (First Expired, First Out) para descuento automático de lotes en ventas

@@ -568,6 +568,59 @@ PLANTILLA ESQUELETO PARA NUEVAS ENTRADAS
   - [x] `lote-fefo.integration.spec.ts`: Despacho con remanente pendiente de asignación en modo offline (EC-LOTE-03).
 - **Estado de Funcionalidad / Fase:** ⏳ En progreso (Bloque 4 / Módulo 2.4 - TASK-10 completada al 100%, siguiente: TASK-11 Registro de Mermas Vinculadas a Lote).
 
+---
+
+## Entrada 11
+
+- **Fecha:** 2026-09-07
+- **Modelo/herramienta:** Antigravity (Gemini 3.8 Flash)
+- **Prompt utilizado:**
+  ```text
+  /goal Ejecuta el Bloque 4 completo (Inventario, Recepciones y Lotes FEFO) actuando como Staff Software Engineer bajo el protocolo estricto de AGENTS.md, GitFlow y Loop Engineering. TASK-11: Registro de Mermas Vinculadas a Lote.
+  ```
+- **Output del agente / Respuesta de la herramienta (resumen ejecutivo):**
+  ```text
+  TASK-11 completada con éxito bajo protocolo estricto GitFlow y Loop Engineering, cerrando el Bloque 4 al 100%:
+  - Entidad de dominio Merma con motivos obligatorios ('corte_proceso', 'vencimiento', 'dano', 'robo', 'otro') según design.md sec. 2 y EARS-INV-04.
+  - Puerto IMermaRepository desacoplado.
+  - DTOs CreateMermaDto y MermaResultDto con validaciones class-validator.
+  - MermaService con lógica integral:
+    * Validación obligatoria de motivos y cantidades mayores a cero.
+    * Reducción de stock general de la sucursal.
+    * Vinculación a lote específico (si aplica), descontando existencias y mutando a 'agotado' si llega a 0.000 (EARS-LOTE-04).
+    * Generación de movimiento de auditoría en MovimientoInventario con delta negativo (-) (EARS-INV-01 / EARS-INV-04).
+    * Validación de pertenencia de lote a la misma sucursal y producto.
+  - WasteController con endpoints POST /waste y GET /waste protegidos con AuthGuard y RolesGuard.
+  - Suite unitaria merma.service.spec.ts pasando al 100% (7/7 tests en verde).
+  - Regresión total del Backend pasando al 100% (24/24 suites, 117/117 tests en verde).
+  - GitFlow: commit convencional a2cafe7 en feature/TASK-11-mermas-vinculadas-lote y merge no-fast-forward a develop.
+  - Mutación inmutable de checkboxes en tasks.md (Bloque 4 cerrado al 100%), FASE_TRACKING.md y PLAN_IMPLEMENTACION.md.
+  ```
+- **Acciones de Git:**
+  - Rama feature: `feature/TASK-11-mermas-vinculadas-lote` (creada desde `develop`)
+  - Commit atómico feature: `a2cafe7 feat(inventory): implementar servicio de mermas vinculadas a lote con motivos obligatorios`
+  - Merge a develop: Merge no-ff a `develop`
+- **Reporte de pruebas automatizadas:**
+  | Suite / Nivel | Total | ✅ Pasaron | ❌ Fallaron | Cobertura (%) |
+  |---|---|---|---|---|
+  | Unitarias (merma.service) | 7 | 7 | 0 | 100% |
+  | Unitarias (movimiento.service) | 2 | 2 | 0 | 100% |
+  | Integración (lote-fefo.integration) | 6 | 6 | 0 | 100% |
+  | Unitarias (inventario.service) | 6 | 6 | 0 | 100% |
+  | **Total Backend Completo (24 Suites)** | **117** | **117** | **0** | **100%** |
+- **Lista detallada de pruebas ejecutadas:**
+  - [x] `merma.service.spec.ts`: Registro de merma con motivos válidos (corte_proceso, vencimiento, dano, robo, otro).
+  - [x] `merma.service.spec.ts`: Reducción de stock de sucursal con delta negativo en auditoría (EARS-INV-04).
+  - [x] `merma.service.spec.ts`: Vinculación a lote con descuento de stock y mutación automática a 'agotado' (EARS-LOTE-04).
+  - [x] `merma.service.spec.ts`: Rechazo ante motivo inválido con BadRequestException.
+  - [x] `merma.service.spec.ts`: Rechazo ante cantidad <= 0 con BadRequestException.
+  - [x] `merma.service.spec.ts`: Rechazo si el lote no existe con NotFoundException.
+  - [x] `merma.service.spec.ts`: Rechazo si el lote pertenece a otra sucursal o producto.
+  - [x] `movimiento.service.spec.ts`: Validación de deltas incrementales y decrementales y soporte de tipo 'merma'.
+  - [x] Todas las 24 suites de pruebas del backend pasando en verde en 27.99 segundos.
+- **Estado de Funcionalidad / Fase:** ✅ Realizada y Probada (Bloque 4 / Módulo 2.4 & 2.7 Inventario, Recepciones, Lotes FEFO y Mermas completado al 100%, siguiente: Bloque 5 / Módulo 2.3 & 2.6 Ventas, Pagos y Turnos de Caja).
+
+
 
 
 

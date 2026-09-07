@@ -73,7 +73,7 @@
   - *Trazabilidad:* EARS-LOTE-02, EARS-LOTE-04, US-18.
   - *Prueba Verificable:* Crear y ejecutar `Backend/tests/integration/lote-fefo.integration.spec.ts`.
 
-- [ ] **TASK-11: Registro de Mermas Vinculadas a Lote**
+- [x] **TASK-11: Registro de Mermas Vinculadas a Lote**
   - *Objetivo:* Implementar servicio de mermas con motivos obligatorios y asociación opcional a `lote_id`.
   - *Trazabilidad:* EARS-INV-04, US-07.
   - *Prueba Verificable:* `npm run test -- merma.service.spec.ts`.
