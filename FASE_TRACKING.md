@@ -90,10 +90,10 @@ Este documento actúa como el **Quality Gate Oficial** del proyecto. Ninguna fas
   - [x] **Pruebas de Catálogo:** `Backend/tests/unit/catalog/*.spec.ts`
   - [x] **Pruebas de Aislamiento:** `Backend/tests/integration/multi-tenant.integration.spec.ts`
 
-- [ ] ⏳ **Catálogo de Productos y Categorías**
-  - [ ] Categorías con orden de visualización para POS
-  - [ ] Productos por peso (precisión 3 decimales en kg) y por unidad
-  - [ ] **Pruebas de Producto:** `Backend/tests/unit/catalog/producto.service.spec.ts`
+- [x] ✅ **Catálogo de Productos y Categorías**
+  - [x] Categorías con orden de visualización para POS
+  - [x] Productos por peso (precisión 3 decimales en kg) y por unidad
+  - [x] **Pruebas de Producto:** `Backend/tests/unit/catalog/producto.service.spec.ts`
 
 ### 2.3 Módulo Ventas & Pagos (Core POS Móvil y Web)
 - [ ] ⏳ **Registro de Venta y Detalle**

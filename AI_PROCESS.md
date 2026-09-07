@@ -428,4 +428,61 @@ PLANTILLA ESQUELETO PARA NUEVAS ENTRADAS
   - [x] `sucursal.service.spec.ts`: Creación vinculada a tenant, validaciones de nombre, zona horaria y actualización.
 - **Estado de Funcionalidad / Fase:** ⏳ En progreso (Módulo 2.2 Catálogo & Multi-Tenant - TASK-07 completada al 100%, siguiente: TASK-08).
 
+---
+
+## Entrada 8
+
+- **Fecha:** 2026-09-07
+- **Modelo/herramienta:** Antigravity (Gemini 3.8 Flash)
+- **Prompt utilizado (continuación /goal Bloque 3):**
+  ```text
+  okey /goal continuar con el proceso bloque 3 siguiendo las buenas practicas mencionadas en AGENTS.md (TASK-08: CRUD de Categorías y Productos con Soporte de Peso/Unidad)
+  ```
+- **Output del agente / Respuesta de la herramienta (resumen ejecutivo):**
+  ```text
+  TASK-08 completada con éxito bajo protocolo estricto GitFlow y Loop Engineering:
+  - Entidad de dominio Categoria (design.md sec. 2) con orden_visualizacion ASC para agilidad de POS de mostrador.
+  - Entidad de dominio Producto con invariantes estrictas de tipo de venta (peso vs unidad), unidades de medida (kg, g, unidad), precio positivo y cálculo de línea de venta según EARS-VENTA-01 (peso al gramo con 3 decimales redondeado a 2 decimales monetarios).
+  - Puertos CategoriaRepositoryPort y ProductoRepositoryPort con consultas optimizadas por tenant y código de barras.
+  - DTOs CreateCategoriaDto, UpdateCategoriaDto, CreateProductoDto, UpdateProductoDto y FilterProductosDto con class-validator.
+  - CategoriaService con ordenamiento automático por ordenVisualizacion ASC y aislamiento multi-tenant.
+  - ProductoService con validación de categorías existentes en el tenant, unicidad de código de barras, filtros avanzados y helper de cálculo monetario calcularTotalLinea() según EARS-VENTA-01.
+  - Controladores CategoriesController y ProductsController con endpoints REST protegidos por AuthGuard, RolesGuard y TenantInterceptor.
+  - Suite unitaria producto.service.spec.ts pasando al 100% (13/13 tests en verde), suite categoria.service.spec.ts pasando al 100% (5/5 tests en verde) y suite general de catálogo pasando al 100% (27/27 tests en verde).
+  - GitFlow: commit convencional 425f8ab en feature/TASK-08-crud-categorias-productos y merge no-fast-forward a develop.
+  - Mutación inmutable de checkboxes en tasks.md (Bloque 3 cerrado al 100%), FASE_TRACKING.md y PLAN_IMPLEMENTACION.md.
+  ```
+- **Acciones de Git:**
+  - Rama feature: `feature/TASK-08-crud-categorias-productos` (creada desde `develop`)
+  - Commit atómico feature: `425f8ab feat(catalog): implementar CRUD de categorias y productos con soporte de peso/unidad y EARS-VENTA-01`
+  - Merge a develop: Merge no-ff
+- **Reporte de pruebas automatizadas:**
+  | Suite / Nivel | Total | ✅ Pasaron | ❌ Fallaron | Cobertura (%) |
+  |---|---|---|---|---|
+  | Unitarias (producto.service) | 13 | 13 | 0 | 100% |
+  | Unitarias (categoria.service) | 5 | 5 | 0 | 100% |
+  | Unitarias Completas de Catálogo (usuario, categoria, producto, negocio, sucursal) | 27 | 27 | 0 | 100% |
+  | Integración Multi-Tenant (multi-tenant.integration) | 11 | 11 | 0 | 100% |
+  | Unitarias de Regresión (auth.service + auth.guard) | 39 | 39 | 0 | 100% |
+  | **Total General Verificado** | **77** | **77** | **0** | **100%** |
+- **Lista detallada de pruebas ejecutadas:**
+  - [x] `producto.service.spec.ts`: Creación de producto por peso con unidad_medida kg y precio positivo.
+  - [x] `producto.service.spec.ts`: Creación de producto por unidad con unidad_medida unidad.
+  - [x] `producto.service.spec.ts`: Rechazo si producto por peso especifica unidad_medida unidad.
+  - [x] `producto.service.spec.ts`: Rechazo si producto por unidad especifica unidad_medida kg o g.
+  - [x] `producto.service.spec.ts`: Rechazo estricto de precios negativos o iguales a cero.
+  - [x] `producto.service.spec.ts`: Rechazo si la categoría no existe en el tenant (BadRequestException).
+  - [x] `producto.service.spec.ts`: Rechazo si el código de barras ya existe en el tenant (ConflictException).
+  - [x] `producto.service.spec.ts`: EARS-VENTA-01: Cálculo de subtotal multiplicando kg (3 decimales) por precio unitario redondeando a 2 decimales monetarios.
+  - [x] `producto.service.spec.ts`: EARS-VENTA-01: Redondeo adecuado de centavos monetarios con precisión flotante.
+  - [x] `producto.service.spec.ts`: Rechazo de cantidades fraccionarias en productos por unidad.
+  - [x] `producto.service.spec.ts`: Cálculo exacto en productos por unidad con cantidades enteras.
+  - [x] `producto.service.spec.ts`: Búsqueda rápida por código de barras para lector POS.
+  - [x] `producto.service.spec.ts`: Aislamiento multi-tenant: NotFoundException ante producto de otro tenant.
+  - [x] `categoria.service.spec.ts`: Creación y ordenamiento ascendente por ordenVisualizacion para POS.
+  - [x] `multi-tenant.integration.spec.ts`: 11 pruebas de aislamiento estricto y contexto de ejecución concurrente.
+  - [x] `auth`: 39 pruebas de autenticación, JWT, cookies, roles y mitigación de PIN POS.
+- **Estado de Funcionalidad / Fase:** ✅ Realizada y Probada (Bloque 3 / Módulo 2.2 Catálogo & Multi-Tenant completado al 100%, siguiente: Bloque 4 / Módulo 2.4 Inventario, Recepciones y Lotes - TASK-09).
+
+
 

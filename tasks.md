@@ -54,7 +54,7 @@
   - *Trazabilidad:* NFR-Aislamiento, US-10.
   - *Prueba Verificable:* `npm run test -- multi-tenant.integration.spec.ts`.
 
-- [ ] **TASK-08: CRUD de Categorías y Productos con Soporte de Peso/Unidad**
+- [x] **TASK-08: CRUD de Categorías y Productos con Soporte de Peso/Unidad**
   - *Objetivo:* Implementar CRUD para `Categoria` y `Producto` validando tipos (`peso` / `unidad`) y precisión de 3 decimales en kg.
   - *Trazabilidad:* EARS-VENTA-01, US-03.
   - *Prueba Verificable:* `npm run test -- producto.service.spec.ts`.
