@@ -1239,6 +1239,89 @@ PLANTILLA ESQUELETO PARA NUEVAS ENTRADAS
   - `Backend/tests/unit/corte-caja/movimiento-caja.service.spec.ts`
   - `Backend/tests/integration/movimientos-caja.integration.spec.ts`
 
+---
+
+## Entrada 21 - 2026-09-07 - Bloque 9: Backend — Seguridad Avanzada, Rate Limiting y Observabilidad (TASK-19 y TASK-20)
+
+- **Fecha:** 2026-09-07
+- **Modelo/herramienta:** Antigravity (Gemini 3.8 Flash)
+- **Prompt utilizado (completo):**
+  ```text
+  /goal Actúa como Staff Software Engineer bajo el protocolo estricto de AGENTS.md, GitFlow y Loop Engineering.
+  TASK-19: Throttling de PIN, Rate Limiting y Hardening HTTP
+  - Configuración de Throttling (@nestjs/throttler): SecurityModule, ThrottlerModule.forRoot con regla global 100 req/min y regla sensible en login/PIN de 5 req/min.
+  - Validación EARS-AUTH-04: Tracker de intentos fallidos de PIN con bloqueo automático durante 60 segundos tras 3 intentos erróneos consecutivos (HTTP 429 Too Many Requests con cabecera Retry-After: 60).
+  - Hardening HTTP (Helmet y CORS): CSP estricto (default-src 'self') y ocultación de X-Powered-By.
+  TASK-20: Logs Canónicos JSON y Correlation IDs (X-Correlation-ID)
+  - CorrelationIdMiddleware: intercepción y extracción o generación UUIDv4 de X-Correlation-ID en req y res headers.
+  - Logger Estructurado Canónico JSON (CanonicalLogInterceptor): emisión de exactamente una línea JSON por petición completada con level, time, correlation_id, method, url, status, duration_ms, tenant_id, user_id.
+  - Enmascaramiento automático de campos sensibles (password, pin, password_hash, pin_pos_hash, token).
+  - Pruebas automatizadas (rate-limit.spec.ts y correlation-logger.spec.ts) y regresión 100% en verde.
+  ```
+- **Output del agente / Respuesta de la herramienta (resumen ejecutivo):**
+  ```text
+  Bloque 9 (TASK-19 y TASK-20) completado con éxito bajo protocolo estricto GitFlow y Loop Engineering:
+  - Dependencias instaladas: @nestjs/throttler y helmet en Backend/package.json.
+  - Módulo de Seguridad y Throttling (Backend/src/common/security/):
+    * SecurityModule configurado con ThrottlerModule.forRoot([{ name: 'default', ttl: 60000, limit: 100 }]) para protección DoS global.
+    * CustomThrottlerGuard extendiendo ThrottlerGuard que inyecta cabecera HTTP Retry-After con el tiempo restante exacto de bloqueo y arroja ThrottlerException (HTTP 429).
+    * Configuración de Helmet en helmet.config.ts con CSP estricto (default-src 'self'), ocultación de cabecera X-Powered-By y política HSTS de 1 año (31536000s).
+    * Decorador @Throttle({ default: { limit: 5, ttl: 60000 } }) aplicado en AuthController para endpoints sensibles: /auth/login, /auth/pin-login y /auth/login-pin.
+    * PinThrottlerService y PinLockoutException (EARS-AUTH-04): Bloqueo automático durante 60 segundos al 4to intento erróneo consecutivo (tras 3 fallos consecutivos), retornando HTTP 429 Too Many Requests y cabecera Retry-After: 60.
+  - Módulo de Observabilidad y Correlation IDs (Backend/src/common/observability/):
+    * CorrelationIdMiddleware implementado para capturar la cabecera X-Correlation-ID entrante o generar deterministamente un UUIDv4 canónico en caso de ausencia, propagándolo en req.correlationId y en la cabecera HTTP de respuesta X-Correlation-ID.
+    * CanonicalLogInterceptor implementado para emitir exactamente una única línea JSON enriquecida por petición completada con time, correlation_id, method, url, status, duration_ms, tenant_id, user_id y error opcional.
+    * Utilidad maskSensitiveData que analiza recursivamente objetos y arrays para enmascarar con '***' cualquier secreto (password, pin, hashes, tokens JWT, refresh tokens).
+    * ObservabilityModule con registro global del interceptor y vinculación de middleware a todas las rutas.
+  - Quality Gate 100% en verde:
+    * tests/unit/security/rate-limit.spec.ts: 7/7 tests pasando al 100%.
+    * tests/unit/observability/correlation-logger.spec.ts: 6/6 tests pasando al 100%.
+    * Regresión completa de 32 suites y 190 tests pasando al 100% en 29.1s.
+  - GitFlow: commits convencionales c42ccbd (TASK-19) y 6cd87d8 (TASK-20) en feature/BLOQUE-09-seguridad-throttling-observabilidad y merge no-ff 9e2fbc3 a develop.
+  - Sincronización remota: ramas develop y feature empujadas exitosamente a origin.
+  - Mutación inmutable de checkboxes en tasks.md, FASE_TRACKING.md y PLAN_IMPLEMENTACION.md.
+  ```
+- **Acciones de Git:**
+  - Rama feature: `feature/BLOQUE-09-seguridad-throttling-observabilidad` (creada desde `develop`)
+  - Commit atómico feature 1: `c42ccbd feat(security): implementar rate limiting sensible para login y PIN con bloqueo EARS-AUTH-04 (TASK-19)`
+  - Commit atómico feature 2: `6cd87d8 feat(observability): configurar logs canonicos JSON y propagacion de X-Correlation-ID (TASK-20)`
+  - Merge a develop: `9e2fbc3 merge: Bloque 9 a develop tras 100% tests en verde`
+  - Push remoto: `develop` y `feature/BLOQUE-09-seguridad-throttling-observabilidad` subidos a `origin`
+- **Reporte de pruebas automatizadas:**
+  | Suite / Nivel | Total | ✅ Pasaron | ❌ Fallaron | Cobertura (%) |
+  |---|---|---|---|---|
+  | Unitarias Seguridad (rate-limit.spec) | 7 | 7 | 0 | 100% |
+  | Unitarias Observabilidad (correlation-logger.spec) | 6 | 6 | 0 | 100% |
+  | Regresión Total Backend (32 Suites) | 190 | 190 | 0 | 100% |
+- **Lista detallada de pruebas ejecutadas:**
+  - [x] `rate-limit.spec.ts`: Permite 3 intentos fallidos consecutivos de PIN sin bloqueo.
+  - [x] `rate-limit.spec.ts`: Bloquea durante 60s al 4to intento consecutivo con HTTP 429 y cabecera Retry-After: 60 (EARS-AUTH-04).
+  - [x] `rate-limit.spec.ts`: Restablece intentos fallidos de PIN tras autenticación exitosa (resetAttempts).
+  - [x] `rate-limit.spec.ts`: Tolera 5 peticiones y bloquea la 6ª petición en < 60s en rutas sensibles de login/PIN (5 req/min).
+  - [x] `rate-limit.spec.ts`: Tolera 100 peticiones globales por minuto y bloquea la 101ª petición.
+  - [x] `rate-limit.spec.ts`: CustomThrottlerGuard inyecta cabecera Retry-After y arroja ThrottlerException (HTTP 429).
+  - [x] `rate-limit.spec.ts`: Helmet configurado con CSP default-src 'self', ocultación de X-Powered-By y HSTS.
+  - [x] `correlation-logger.spec.ts`: Propagación de X-Correlation-ID existente en req y res headers.
+  - [x] `correlation-logger.spec.ts`: Generación de nuevo UUIDv4 canónico en ausencia de cabecera.
+  - [x] `correlation-logger.spec.ts`: Enmascaramiento recursivo con '***' de contraseñas, PINs, tokens y hashes sensibles.
+  - [x] `correlation-logger.spec.ts`: Emisión de exactamente una línea JSON estructurada por petición completada (200 OK).
+  - [x] `correlation-logger.spec.ts`: Emisión de log estructurado con level warn/error ante excepciones HTTP.
+  - [x] Regresión completa de 32 suites y 190 tests pasando al 100%.
+- **Estado de Funcionalidad / Fase:** ✅ Realizada y Probada (Bloque 9 completado al 100%, Backend Fase 2 cerrada al 100%).
+- **Qué se generó:**
+  - `Backend/src/common/security/custom-throttler.guard.ts`
+  - `Backend/src/common/security/helmet.config.ts`
+  - `Backend/src/common/security/security.module.ts`
+  - `Backend/src/common/security/index.ts`
+  - `Backend/src/common/observability/correlation-id.middleware.ts`
+  - `Backend/src/common/observability/masking.util.ts`
+  - `Backend/src/common/observability/canonical-log.interceptor.ts`
+  - `Backend/src/common/observability/observability.module.ts`
+  - `Backend/src/common/observability/index.ts`
+  - `Backend/tests/unit/security/rate-limit.spec.ts`
+  - `Backend/tests/unit/observability/correlation-logger.spec.ts`
+
+
 
 
 

@@ -140,12 +140,12 @@
 ## Bloque 9: Backend — Seguridad Avanzada, Rate Limiting y Observabilidad
 *Skills:* `.agent/Anthropic-Cybersecurity-Skills-main`, `.agent/talleros-backend-engineer`
 
-- [ ] **TASK-19: Throttling de PIN y Rate Limiting en Endpoints Sensibles**
+- [x] **TASK-19: Throttling de PIN y Rate Limiting en Endpoints Sensibles**
   - *Objetivo:* Configurar `@nestjs/throttler` en rutas de login y PIN (5 req/min) y protección global (100 req/min).
   - *Trazabilidad:* EARS-AUTH-04, `design.md` Sec. 14.2.
   - *Prueba Verificable:* `npm run test -- rate-limit.spec.ts`.
 
-- [ ] **TASK-20: Logs Canónicos JSON y Correlation IDs (`X-Correlation-ID`)**
+- [x] **TASK-20: Logs Canónicos JSON y Correlation IDs (`X-Correlation-ID`)**
   - *Objetivo:* Middleware de `pino-http` que inyecte `X-Correlation-ID` en cada log y trace de petición.
   - *Trazabilidad:* `design.md` Sec. 1.7.
   - *Prueba Verificable:* Inspección de formato estructurado JSON en logger interceptor.

@@ -173,11 +173,11 @@ Este documento actúa como el **Quality Gate Oficial** del proyecto. Ninguna fas
   - [x] **Pruebas Unitarias:** `Backend/tests/unit/common/events.spec.ts`
 
 ### 2.10 Módulo Ciberseguridad Avanzada y Observabilidad
-- [ ] ⏳ **Hardening y Monitoreo**
-  - [ ] Throttling con `@nestjs/throttler` en endpoints sensibles
-  - [ ] Logs canónicos estructurados JSON con `pino-http`
-  - [ ] Middleware `X-Correlation-ID` propagado
-  - [ ] **Pruebas de Seguridad:** `Backend/tests/unit/common/security.spec.ts`
+- [x] ✅ **Hardening y Monitoreo**
+  - [x] Throttling con `@nestjs/throttler` en endpoints sensibles
+  - [x] Logs canónicos estructurados JSON con `pino-http`
+  - [x] Middleware `X-Correlation-ID` propagado
+  - [x] **Pruebas de Seguridad:** `Backend/tests/unit/security/rate-limit.spec.ts` y `Backend/tests/unit/observability/correlation-logger.spec.ts`
 
 ---
 
