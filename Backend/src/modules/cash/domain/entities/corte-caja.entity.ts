@@ -1,4 +1,4 @@
-﻿export type EstadoTurnoCaja = 'abierta' | 'cerrada';
+export type EstadoTurnoCaja = 'abierta' | 'cerrada';
 
 export interface TotalesPorMetodoPago {
   efectivo?: number;
@@ -17,6 +17,8 @@ export interface CorteCajaProps {
   fechaApertura: Date;
   fechaCierre?: Date | null;
   montoApertura: number;
+  totalIngresosExtra?: number;
+  totalEgresos?: number;
   totalEfectivoEsperado?: number;
   totalEfectivoContado?: number;
   diferencia?: number;
@@ -33,6 +35,8 @@ export class CorteCaja {
   public readonly fechaApertura: Date;
   private _fechaCierre: Date | null;
   public readonly montoApertura: number;
+  private _totalIngresosExtra: number;
+  private _totalEgresos: number;
   private _totalEfectivoEsperado: number;
   private _totalEfectivoContado: number;
   private _diferencia: number;
@@ -48,7 +52,11 @@ export class CorteCaja {
     this.fechaApertura = props.fechaApertura;
     this._fechaCierre = props.fechaCierre ?? null;
     this.montoApertura = Number(props.montoApertura) || 0;
-    this._totalEfectivoEsperado = Number(props.totalEfectivoEsperado) || this.montoApertura;
+    this._totalIngresosExtra = Number(props.totalIngresosExtra) || 0;
+    this._totalEgresos = Number(props.totalEgresos) || 0;
+    this._totalEfectivoEsperado =
+      Number(props.totalEfectivoEsperado) ||
+      (this.montoApertura + this._totalIngresosExtra - this._totalEgresos);
     this._totalEfectivoContado = Number(props.totalEfectivoContado) || 0;
     this._diferencia = Number(props.diferencia) || 0;
     this._totalesPorMetodoPago = props.totalesPorMetodoPago ?? {};
@@ -61,6 +69,14 @@ export class CorteCaja {
 
   get fechaCierre(): Date | null {
     return this._fechaCierre;
+  }
+
+  get totalIngresosExtra(): number {
+    return this._totalIngresosExtra;
+  }
+
+  get totalEgresos(): number {
+    return this._totalEgresos;
   }
 
   get totalEfectivoEsperado(): number {
@@ -92,6 +108,45 @@ export class CorteCaja {
   }
 
   /**
+   * Calcula el saldo de efectivo actualmente disponible en caja física:
+   * saldoDisponible = montoApertura + ventasEfectivo + totalIngresosExtra - totalEgresos
+   */
+  public calcularSaldoDisponible(ventasEfectivo: number = 0): number {
+    return (
+      Math.round(
+        (this.montoApertura +
+          Number(ventasEfectivo) +
+          this._totalIngresosExtra -
+          this._totalEgresos) *
+          100,
+      ) / 100
+    );
+  }
+
+  /**
+   * En cualquier momento, el efectivo esperado coincide con el saldo teórico de caja:
+   * efectivoEsperado = montoApertura + ventasEfectivo + totalIngresosExtra - totalEgresos
+   */
+  public calcularEfectivoEsperado(ventasEfectivo: number = 0): number {
+    return this.calcularSaldoDisponible(ventasEfectivo);
+  }
+
+  /**
+   * Registra un movimiento extraordinario de caja (ingreso o egreso) en los acumuladores del turno.
+   */
+  public registrarMovimiento(tipo: 'ingreso' | 'egreso', monto: number): void {
+    if (this._estado === 'cerrada') {
+      throw new Error('No se pueden registrar movimientos en un turno de caja cerrado.');
+    }
+    const val = Math.round(Number(monto) * 100) / 100;
+    if (tipo === 'ingreso') {
+      this._totalIngresosExtra = Math.round((this._totalIngresosExtra + val) * 100) / 100;
+    } else if (tipo === 'egreso') {
+      this._totalEgresos = Math.round((this._totalEgresos + val) * 100) / 100;
+    }
+  }
+
+  /**
    * EARS-CAJA-02:
    * Calcula la diferencia aritmetica inmutable: contado - esperado
    * y sella el turno como cerrado.
@@ -118,8 +173,7 @@ export class CorteCaja {
 
   public actualizarEfectivoEsperado(ventasEfectivoAcumuladas: number): void {
     if (this._estado === 'abierta') {
-      this._totalEfectivoEsperado =
-        Math.round((this.montoApertura + Number(ventasEfectivoAcumuladas)) * 100) / 100;
+      this._totalEfectivoEsperado = this.calcularEfectivoEsperado(ventasEfectivoAcumuladas);
     }
   }
 
@@ -133,6 +187,8 @@ export class CorteCaja {
       fechaApertura: this.fechaApertura,
       fechaCierre: this.fechaCierre,
       montoApertura: this.montoApertura,
+      totalIngresosExtra: this.totalIngresosExtra,
+      totalEgresos: this.totalEgresos,
       totalEfectivoEsperado: this.totalEfectivoEsperado,
       totalEfectivoContado: this.totalEfectivoContado,
       diferencia: this.diferencia,
