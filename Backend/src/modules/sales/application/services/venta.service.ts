@@ -6,10 +6,12 @@ import {
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Venta } from '../../domain/entities/venta.entity';
 import { DetalleVenta } from '../../domain/entities/detalle-venta.entity';
 import { PagoVenta } from '../../domain/entities/pago-venta.entity';
 import { VentaCompletadaEvent } from '../../domain/events/venta-completada.event';
+import { VentaAnuladaEvent } from '../../domain/events/venta-anulada.event';
 import {
   IVentaRepository,
   VENTA_REPOSITORY,
@@ -41,6 +43,8 @@ export class VentaService implements ISalesCashQueryProvider {
     @Optional()
     @Inject(DOMAIN_EVENT_EMITTER)
     private readonly eventEmitter?: IDomainEventEmitter,
+    @Optional()
+    private readonly eventEmitter2?: EventEmitter2,
   ) {}
 
   /**
@@ -181,7 +185,9 @@ export class VentaService implements ISalesCashQueryProvider {
       nuevaVenta.fechaHoraServidor,
     );
 
-    if (this.eventEmitter) {
+    if (this.eventEmitter2) {
+      this.eventEmitter2.emit(VentaCompletadaEvent.EVENT_NAME, evento);
+    } else if (this.eventEmitter) {
       this.eventEmitter.emit(VentaCompletadaEvent.EVENT_NAME, evento);
     }
 
@@ -204,6 +210,27 @@ export class VentaService implements ISalesCashQueryProvider {
       await this.ventaRepo.actualizar(venta);
     } else {
       this.ventasEnMemoria.set(venta.id, venta);
+    }
+
+    // Emisión de Evento de Dominio VentaAnuladaEvent (design.md Sec. 8)
+    const eventoAnulacion = new VentaAnuladaEvent(
+      venta.id,
+      venta.sucursalId,
+      dto.motivo,
+      dto.usuarioId,
+      venta.detalles.map((d) => ({
+        productoId: d.productoId,
+        cantidad: d.cantidad,
+        precioUnitario: d.precioUnitario,
+        pesoNeto: d.pesoNeto,
+      })),
+      new Date(),
+    );
+
+    if (this.eventEmitter2) {
+      this.eventEmitter2.emit(VentaAnuladaEvent.EVENT_NAME, eventoAnulacion);
+    } else if (this.eventEmitter) {
+      this.eventEmitter.emit(VentaAnuladaEvent.EVENT_NAME, eventoAnulacion);
     }
 
     return this.mapToResponse(venta);

@@ -170,6 +170,31 @@ export class Lote {
     return this._estado === 'agotado';
   }
 
+  /**
+   * Restaura o incrementa existencias en el lote (ej. reversión de venta anulada).
+   * Si el lote estaba 'agotado', se reactiva a 'activo' si no está vencido.
+   */
+  public reponer(cantidad: number): void {
+    if (cantidad <= 0) {
+      throw new Error('La cantidad a reponer debe ser mayor a cero');
+    }
+    this._cantidadDisponible = Number((this._cantidadDisponible + cantidad).toFixed(3));
+    if (this._estado === 'agotado') {
+      const ahora = new Date();
+      if (this._fechaVencimiento && this._fechaVencimiento.getTime() < ahora.getTime()) {
+        this._estado = 'vencido';
+      } else {
+        this._estado = 'activo';
+      }
+    }
+  }
+
+  public reabrir(): void {
+    if (this._estado === 'agotado') {
+      this._estado = 'activo';
+    }
+  }
+
   public toResponseDto(): LoteResponseDto {
     return {
       id: this._id,

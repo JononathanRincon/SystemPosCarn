@@ -1,9 +1,11 @@
 import { Injectable, Inject, Optional, BadRequestException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import * as crypto from 'crypto';
 import { Lote, EstadoLote } from '../../domain/entities/lote.entity';
 import { RecepcionMercancia } from '../../domain/entities/recepcion-mercancia.entity';
 import { Inventario } from '../../domain/entities/inventario.entity';
 import { MovimientoInventario } from '../../domain/entities/movimiento-inventario.entity';
+import { RecepcionCreadaEvent } from '../../domain/events/recepcion-creada.event';
 import {
   ILoteRepository,
   LOTE_REPOSITORY,
@@ -39,6 +41,8 @@ export class InventarioService {
     @Optional()
     @Inject(MOVIMIENTO_REPOSITORY)
     private readonly movimientoRepo?: IMovimientoRepository,
+    @Optional()
+    private readonly eventEmitter?: EventEmitter2,
   ) {}
 
   /**
@@ -164,6 +168,29 @@ export class InventarioService {
     }
 
     const alertaCadenaFrio = hayAlertaVehiculo || hayAlertaItems;
+
+    // Emisión de Evento de Dominio RecepcionCreadaEvent (design.md Sec. 8)
+    const evento = new RecepcionCreadaEvent(
+      recepcionId,
+      dto.sucursal_id,
+      dto.proveedor,
+      usuarioId,
+      dto.items.map((i) => ({
+        productoId: i.producto_id,
+        codigoLote: i.codigo_lote,
+        cantidad: i.cantidad,
+        costoUnitario: i.costo_unitario,
+        temperaturaRecepcion: i.temperatura_recepcion,
+        fechaVencimiento: i.fecha_vencimiento ? new Date(i.fecha_vencimiento) : null,
+      })),
+      alertaCadenaFrio,
+      dto.temperatura_vehiculo,
+      new Date(),
+    );
+
+    if (this.eventEmitter) {
+      this.eventEmitter.emit(RecepcionCreadaEvent.EVENT_NAME, evento);
+    }
 
     return {
       recepcion_id: recepcionId,
