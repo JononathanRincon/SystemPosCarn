@@ -8,6 +8,7 @@ import {
   HttpStatus,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { Response, Request } from 'express';
 import { AuthService } from '../../application/services/auth.service';
 import {
@@ -24,8 +25,10 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   /**
-   * Endpoint POST /auth/login (design.md sec. 7.1)
+   * Endpoint POST /auth/login (design.md sec. 7.1 y 14.2)
+   * Rate limiting sensible: 5 peticiones por minuto.
    */
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
@@ -73,10 +76,22 @@ export class AuthController {
   /**
    * Endpoint POST /auth/pin-login (design.md sec. 7.1 endpoint 3, EARS-AUTH-03, EARS-AUTH-04)
    * Validación local rápida de PIN para cajeros con mitigación de fuerza bruta (bloqueo tras 3 intentos erróneos durante 60s).
+   * Rate limiting sensible: 5 peticiones por minuto.
    */
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('pin-login')
   @HttpCode(HttpStatus.OK)
   async pinLogin(@Body() pinLoginDto: PinLoginDto): Promise<PinLoginResponseDto> {
+    return this.authService.pinLogin(pinLoginDto);
+  }
+
+  /**
+   * Alias de compatibilidad: POST /auth/login-pin
+   */
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Post('login-pin')
+  @HttpCode(HttpStatus.OK)
+  async loginPin(@Body() pinLoginDto: PinLoginDto): Promise<PinLoginResponseDto> {
     return this.authService.pinLogin(pinLoginDto);
   }
 }
