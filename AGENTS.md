@@ -27,10 +27,11 @@ graph TD
 1. **Identificar la Fase Activa:** Abre [FASE_TRACKING.md](file:///c:/Users/Galiatech/Documents/SystemPosCarns/FASE_TRACKING.md). La primera fase o módulo que tenga `[ ] ⏳ En Progreso` es el foco actual del proyecto.
 2. **Localizar la Tarea Específica:** Abre [tasks.md](file:///c:/Users/Galiatech/Documents/SystemPosCarns/tasks.md) y busca la **primera tarea con checkbox sin marcar: `[ ]`**. Esa es tu ÚNICA tarea a ejecutar. Queda prohibido saltar tareas o ejecutar múltiples a la vez.
 3. **Lectura Quirúrgica de Requerimientos (Cuidado de Contexto):**
-   - Ve a [requirements.md](file:///c:/Users/Galiatech/Documents/SystemPosCarns/requirements.md) y lee **únicamente** las historias de usuario (US) y requisitos EARS indicados en la trazabilidad de la tarea.
-   - **ESTÁ PROHIBIDO** leer el archivo `SDD_POS_Carniceria.md` completo para no saturar la ventana de contexto.
+   - **OBLIGATORIO:** Ejecuta la herramienta `view_file` sobre [requirements.md](file:///c:/Users/Galiatech/Documents/SystemPosCarns/requirements.md) para leer **únicamente** las historias de usuario (US) y requisitos EARS indicados en la tarea.
+   - **ESTÁ PROHIBIDO** asumir requisitos de memoria o leer el archivo `SDD_POS_Carniceria.md` completo.
 4. **Lectura de Especificación Técnica:**
-   - Ve a [design.md](file:///c:/Users/Galiatech/Documents/SystemPosCarns/design.md) y consulta el esquema de base de datos, DTO, endpoint o patrón arquitectónico exacto de la tarea.
+   - **OBLIGATORIO:** Ejecuta la herramienta `view_file` sobre [design.md](file:///c:/Users/Galiatech/Documents/SystemPosCarns/design.md) para consultar el esquema exacto de base de datos, DTO, endpoint o patrón arquitectónico.
+   - **CONDICIÓN DE BLOQUEO:** Queda prohibido escribir código sin haber llamado previamente a `view_file` para contrastar el diseño técnico real.
 5. **Invocación de Skills de `.agent/`:**
    - Consulta la tabla de mapeo de skills en [PLAN_IMPLEMENTACION.md](file:///c:/Users/Galiatech/Documents/SystemPosCarns/PLAN_IMPLEMENTACION.md) y aplica las directrices de la skill correspondiente (ej. `Anthropic-Cybersecurity-Skills-main` para seguridad, `talleros-backend-engineer` para transacciones, `supabase` para base de datos).
 6. **Aislamiento en Rama GitFlow:**
