@@ -121,3 +121,71 @@ El repositorio sigue estrictamente el modelo **GitFlow**:
 5. **Paso E: Registro en `AI_PROCESS.md`**
    - Documentar la rama creada, el commit hash y el resultado cuantitativo de las pruebas.
 
+---
+
+## 7. Protocolo de Loop Engineering y Contexto Just-In-Time
+
+Para maximizar la autonomía del agente, evitar la sobrecarga de tokens y prevenir alucinaciones arquitectónicas, se establece la estrategia **"Kickoff de Módulo + Loop por Micro-tarea"**:
+
+### 7.1 Estrategia de Lectura de Contexto (Kickoff vs. Loop)
+- **Kickoff de Módulo / Bloque (Lectura Focalizada):**
+  - Al iniciar un **nuevo bloque funcional** de `tasks.md` (ej. Bloque 2: Auth, Bloque 4: Lotes), el agente lee **únicamente la sección técnica correspondiente a ese bloque** en `design.md` (esquema de tablas, endpoints y reglas) y en `requirements.md` (historias y requisitos EARS asociados).
+  - Esto le da al agente la **visión arquitectónica global del módulo** sin cargar las 1,100 líneas del documento completo.
+- **Ejecución por Tarea (Zero-Read Loop):**
+  - Mientras el agente avanza dentro de las micro-tareas del bloque (ej. de TASK-04 a TASK-05), **NO vuelve a releer los documentos en cada ciclo**. Opera con la memoria de trabajo del bloque.
+  - **Lectura Perezosa (Lazy Loading):** Solo vuelve a consultar `design.md` si un error de compilación o test revela una duda puntual sobre un tipo de dato, interface o enum.
+
+### 7.2 Arquitectura de Loop Engineering
+
+```mermaid
+graph TD
+    subgraph KICKOFF ["1. Kickoff de Bloque / Módulo"]
+        READ_SPEC["Lectura focalizada de sección en design.md y requirements.md"]
+    end
+
+    subgraph OUTER_LOOP ["2. Bucle Externo (Ciclo de Tarea)"]
+        PICK["Tomar siguiente [ ] en tasks.md"]
+        BRANCH["git checkout -b feature/TASK-XX"]
+        
+        subgraph INNER_LOOP ["3. Bucle Interno (TDD / Auto-Corrección)"]
+            CODE["Escribir / Editar Código"]
+            TEST["Ejecutar Prueba Automatizada"]
+            CHECK{"¿100% Verde?"}
+            FIX["Analizar salida de terminal y auto-corregir"]
+            
+            CODE --> TEST
+            TEST --> CHECK
+            CHECK -->|Falla| FIX
+            FIX --> CODE
+        end
+        
+        COMMIT["Commit Convencional + Merge a develop"]
+        MUTATE["Mutar [ ] a [x] en tasks.md"]
+        AUDIT["Registrar en AI_PROCESS.md"]
+        NEXT{"¿Siguiente tarea del bloque?"}
+        
+        BRANCH --> CODE
+        CHECK -->|Verde| COMMIT
+        COMMIT --> MUTATE
+        MUTATE --> AUDIT
+        AUDIT --> NEXT
+    end
+
+    READ_SPEC --> PICK
+    NEXT -->|SÍ| PICK
+    NEXT -->|NO (Fin de Bloque)| PAUSE["Pausar y Notificar al Usuario"]
+```
+
+### 7.3 Bucle Interno (Inner Loop — Auto-Sanación y TDD)
+1. El agente escribe el código de la micro-tarea.
+2. Ejecuta el test indicado en `tasks.md` (ej. `npm run test -- auth.service.spec.ts`).
+3. **Si el test falla:** El agente analiza el error devuelto por la consola de pruebas, ajusta el código y re-ejecuta el test de forma autónoma **sin pedir intervención humana**.
+4. **Límite de Seguridad:** Si tras **3 intentos consecutivos** el test no converge a verde, el agente debe detener el bucle, reportar la causa raíz al usuario y esperar instrucciones.
+
+### 7.4 Bucle Externo (Outer Loop — Transición y Cierre)
+1. Con los tests al 100% en verde, el agente ejecuta el commit convencional y el merge no-fast-forward a `develop`.
+2. Muta el checkbox de `[ ]` a `[x]` en `tasks.md` y `FASE_TRACKING.md` respetando la regla de inmutabilidad.
+3. Registra la bitácora en `AI_PROCESS.md`.
+4. Continúa automáticamente con la siguiente tarea del mismo bloque si está en modo `/goal` o ejecución continua.
+
+
