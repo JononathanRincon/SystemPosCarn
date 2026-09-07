@@ -100,3 +100,20 @@ export class FilterProductosDto {
   @IsBoolean({ message: 'El filtro activo debe ser booleano' })
   activo?: boolean;
 }
+
+export class CambiarPrecioDto {
+  @IsNumber({ maxDecimalPlaces: 2 }, { message: 'El precio debe ser un número con máximo 2 decimales' })
+  @IsPositive({ message: 'El precio debe ser un número estrictamente positivo' })
+  precio!: number;
+}
+
+export interface CatalogoSucursalDto {
+  sucursalId: string;
+  tenantId: string;
+  productos: any[];
+  categorias: any[];
+  totalProductos: number;
+  generadoEn: string;
+  fromCache?: boolean;
+}
+
