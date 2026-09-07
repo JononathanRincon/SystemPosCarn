@@ -96,7 +96,7 @@
 
 ## Bloque 6: Backend — Sincronización Offline-First
 
-- [ ] **TASK-14: Endpoint Idempotente `/sales/sync`**
+- [x] **TASK-14: Endpoint Idempotente `/sales/sync`**
   - *Objetivo:* Procesar lote de ventas con UUIDs de cliente, garantizando que transacciones duplicadas respondan HTTP 200 sin doble inserción.
   - *Trazabilidad:* EARS-SYNC-01, EARS-SYNC-04, US-05.
   - *Prueba Verificable:* `npm run test -- sync-offline.integration.spec.ts`.

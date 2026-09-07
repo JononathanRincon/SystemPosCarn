@@ -120,12 +120,12 @@ Este documento actúa como el **Quality Gate Oficial** del proyecto. Ninguna fas
 
 ### 2.5 Módulo Sincronización Offline-First
 - [ ] ⏳ **Motor de Sincronización Idempotente (Móvil y Web PWA)**
-  - [ ] Endpoint `/sales/sync` idempotente por UUID
+  - [x] Endpoint `/sales/sync` idempotente por UUID
   - [ ] Endpoint `/catalog/sync` con tokens temporales
   - [ ] Manejo de concurrencia y stock negativo sin bloquear caja
-  - [ ] **Pruebas de Sync Unitarias:** `Backend/tests/unit/sync/sync.service.spec.ts`
+  - [x] **Pruebas de Sync Unitarias:** `Backend/tests/unit/sync/sync.service.spec.ts`
   - [ ] **Pruebas de Resolución de Conflictos:** `Backend/tests/unit/sync/conflicto.service.spec.ts`
-  - [ ] **Prueba de Integración Offline:** `Backend/tests/integration/sync-offline.integration.spec.ts`
+  - [x] **Prueba de Integración Offline:** `Backend/tests/integration/sync-offline.integration.spec.ts`
   - [ ] **Prueba de Integración Concurrente:** `Backend/tests/integration/sync-conflicto.integration.spec.ts`
 
 ### 2.6 Módulo Corte de Caja

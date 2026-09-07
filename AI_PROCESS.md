@@ -756,3 +756,59 @@ PLANTILLA ESQUELETO PARA NUEVAS ENTRADAS
   - [x] `venta-completa.integration.spec.ts`: Integración completa de flujo de venta, congelación de precios, pesaje de 3 decimales, pagos mixtos, impacto en turno de caja y reversión por anulación.
 - **Estado de Funcionalidad / Fase:** ✅ Realizada y Probada (Bloque 5 / Módulo 2.3 & 2.6 Ventas, Pagos y Turnos de Caja completado al 100%, siguiente: Bloque 6 / Módulo 2.5 Sincronización Offline-First).
 
+---
+
+## Entrada 14
+
+- **Fecha:** 2026-09-07
+- **Modelo/herramienta:** Antigravity (Gemini 3.8 Flash)
+- **Prompt utilizado:**
+  ```text
+  TASK-14: Endpoint Idempotente de Ingesta por Lotes /sales/sync
+  - Rama: feature/TASK-14-endpoint-idempotente-sales-sync desde develop.
+  - Requisitos: EARS-SYNC-01, EARS-SYNC-04, US-05.
+  - Implementación:
+    1. POST /sales/sync recibiendo array de ventas generadas offline (idempotencia por UUID).
+    2. Ingesta por lotes ACID sin descartar ventas válidas si alguna es duplicada.
+    3. Validación de lote_id opcional (si no se especifica, aplicar fallback FEFO automático).
+    4. Marcado inmutable de sincronizada: true en servidor.
+  - Prueba Verificable: npm run test -- sync-offline.integration.spec.ts (100% verde).
+  ```
+- **Output del agente / Respuesta de la herramienta (resumen ejecutivo):**
+  ```text
+  TASK-14 completada con éxito bajo protocolo estricto GitFlow y Loop Engineering:
+  - Módulo SyncModule creado en src/modules/sync/ con arquitectura limpia:
+    * DTOs SyncBatchSalesDto, SyncBatchResultDto, SyncSaleItemResultDto con class-validator.
+    * SyncController con endpoint POST /sales/sync protegido con JwtAuthGuard y RolesGuard.
+    * SyncService con procesamiento por lotes atómico por venta:
+      - Deduplicación estricta e idempotente: si el UUID ya existe en BD, responde 200 OK con 'ya_sincronizada' y los datos persistidos (EARS-SYNC-04).
+      - Ingesta de ventas offline desacopladas del estado de caja en el servidor (esOffline: true), garantizando que las ventas físicas ya ocurridas nunca se bloqueen.
+      - Fallback automático a selección FEFO de lotes cuando no viene lote_id en el detalle.
+      - Marcado inmutable de sincronizada: true en servidor al ser procesada.
+      - Resumen batch detallado con totalRecibidas, procesadas, duplicadas, fallidas y detalle item por item.
+  - Actualización de VentaService y CreateVentaDto para soportar el flag esOffline y marcar sincronizada: true en servidor.
+  - Suites de pruebas en verde al 100%:
+    * tests/unit/sync/sync.service.spec.ts: 6 tests pasando.
+    * tests/integration/sync-offline.integration.spec.ts: 3 tests pasando.
+    * Regresión completa de 24 suites y 144 tests pasando al 100%.
+  - GitFlow: commit 2933973 en feature/TASK-14-endpoint-idempotente-sales-sync y merge no-ff a develop (commit 7203b51).
+  - Mutación inmutable de checkboxes en tasks.md, FASE_TRACKING.md y PLAN_IMPLEMENTACION.md.
+  ```
+- **Acciones de Git:**
+  - Rama feature: `feature/TASK-14-endpoint-idempotente-sales-sync` (creada desde `develop`)
+  - Commit atómico feature: `2933973 feat(sync): implementar endpoint de ingesta masiva idempotente /sales/sync`
+  - Merge a develop: `7203b51 merge: feature/TASK-14-endpoint-idempotente-sales-sync a develop tras 100% tests en verde`
+- **Reporte de pruebas automatizadas:**
+  | Suite / Nivel | Total | ✅ Pasaron | ❌ Fallaron | Cobertura (%) |
+  |---|---|---|---|---|
+  | Unitarias (sync.service) | 6 | 6 | 0 | 100% |
+  | Integración (sync-offline.integration) | 3 | 3 | 0 | 100% |
+  | **Total Backend Completo (24 Suites)** | **144** | **144** | **0** | **100%** |
+- **Lista detallada de pruebas ejecutadas:**
+  - [x] `sync.service.spec.ts`: Ingesta masiva de lote de ventas offline con marcado sincronizada = true (EARS-SYNC-01).
+  - [x] `sync.service.spec.ts`: Deduplicación e idempotencia estricta por UUID sin duplicar registros (EARS-SYNC-04).
+  - [x] `sync.service.spec.ts`: Manejo resiliente de lotes mixtos (ventas válidas + duplicadas + errores aislados).
+  - [x] `sync.service.spec.ts`: Asignación automática de lote FEFO cuando detalle no incluye lote_id.
+  - [x] `sync-offline.integration.spec.ts`: Integración de SyncController y SyncService verificando contratos HTTP y respuestas por lote.
+- **Estado de Funcionalidad / Fase:** ⏳ En progreso (TASK-14 completada, siguiente: TASK-15 Manejo de Concurrencia de Inventario y Alertas de Stock Negativo).
+

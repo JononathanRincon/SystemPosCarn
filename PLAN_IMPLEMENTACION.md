@@ -71,7 +71,7 @@ Para asegurar la máxima calidad sin degradar la memoria del agente, cada fase y
 - [ ] **2.5.3 Ingresos Extraordinarios y Ajustes de Base:** Registro de entradas de efectivo sin alterar métricas de ventas.
 
 ### 2.6 Motor de Sincronización Offline-First Idempotente
-- [ ] **2.6.1 Endpoint Idempotente `/sales/sync`:** Ingesta de lotes de transacciones generadas offline con UUIDs de cliente evitando duplicidad.
+- [x] **2.6.1 Endpoint Idempotente `/sales/sync`:** Ingesta de lotes de transacciones generadas offline con UUIDs de cliente evitando duplicidad.
 - [ ] **2.6.2 Cola Asíncrona con BullMQ:** Amortiguación de ráfagas masivas de sincronización respondiendo HTTP 202 a los terminales.
 - [ ] **2.6.3 Descarga de Catálogo Incremental (`/catalog/sync`):** Descarga de deltas por sync token temporal.
 - [ ] **2.6.4 Resolución Concurrente de Inventario y Alertas Negativas:** Aplicación determinista de deltas sin bloquear cajas.
