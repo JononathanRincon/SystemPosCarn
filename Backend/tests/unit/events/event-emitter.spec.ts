@@ -413,5 +413,50 @@ describe('Bus de Eventos de Dominio (TASK-17 - EventEmitter2)', () => {
       expect(cadenaFrioAlertService.obtenerAlertasPorSucursal(sucursalId)).toHaveLength(1);
       expect(cadenaFrioAlertService.obtenerAlertasPorSucursal('suc-otra')).toHaveLength(0);
     });
+
+    it('debe exponer aliases canónicos items, itemsRevertidos y lotes en eventos de dominio', () => {
+      const vComp = new VentaCompletadaEvent(
+        'v-1',
+        sucursalId,
+        'dev-1',
+        100,
+        [{ productoId: 'p-1', cantidad: 2, precioUnitario: 50 }],
+        new Date(),
+        'efectivo',
+        'tenant-1',
+      );
+      expect(vComp.items).toEqual(vComp.detalles);
+      expect(vComp.tenantId).toBe('tenant-1');
+      expect(vComp.metodoPago).toBe('efectivo');
+
+      const vAnul = new VentaAnuladaEvent(
+        'v-1',
+        sucursalId,
+        'motivo',
+        'u-1',
+        [{ productoId: 'p-1', cantidad: 2, precioUnitario: 50 }],
+        new Date(),
+        'tenant-1',
+      );
+      expect(vAnul.itemsRevertidos).toEqual(vAnul.detalles);
+      expect(vAnul.tenantId).toBe('tenant-1');
+
+      const recCre = new RecepcionCreadaEvent(
+        'r-1',
+        sucursalId,
+        'prov',
+        'u-1',
+        [{ productoId: 'p-1', codigoLote: 'L1', cantidad: 10, costoUnitario: 20 }],
+        false,
+        3.0,
+        new Date(),
+        'tenant-1',
+        3.0,
+      );
+      expect(recCre.lotes).toEqual(recCre.items);
+      expect(recCre.tenantId).toBe('tenant-1');
+      expect(recCre.temperaturaRecepcion).toBe(3.0);
+    });
   });
 });
+

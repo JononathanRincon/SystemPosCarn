@@ -5,6 +5,7 @@ export interface ItemRecepcionEvent {
   costoUnitario: number;
   temperaturaRecepcion?: number | null;
   fechaVencimiento?: Date | null;
+  loteId?: string | null;
 }
 
 export class RecepcionCreadaEvent {
@@ -19,5 +20,11 @@ export class RecepcionCreadaEvent {
     public readonly alertaCadenaFrio: boolean,
     public readonly temperaturaVehiculo?: number | null,
     public readonly timestamp: Date = new Date(),
+    public readonly tenantId?: string,
+    public readonly temperaturaRecepcion?: number | null,
   ) {}
+
+  get lotes(): ItemRecepcionEvent[] {
+    return this.items;
+  }
 }
