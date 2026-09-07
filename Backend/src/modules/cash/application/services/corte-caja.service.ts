@@ -1,4 +1,4 @@
-﻿import {
+import {
   Injectable,
   Inject,
   Optional,
@@ -144,7 +144,7 @@ export class CorteCajaService {
       }
     }
 
-    const efectivoEsperado = Math.round((corte.montoApertura + ventasEfectivo) * 100) / 100;
+    const efectivoEsperado = corte.calcularEfectivoEsperado(ventasEfectivo);
 
     corte.cerrarTurno(
       dto.totalEfectivoContado,
@@ -172,6 +172,21 @@ export class CorteCajaService {
     return turno !== null && turno.estaAbierta();
   }
 
+  public async buscarPorId(corteId: string): Promise<CorteCaja | null> {
+    if (this.corteCajaRepo) {
+      return this.corteCajaRepo.buscarPorId(corteId);
+    }
+    return this.turnosEnMemoria.get(corteId) || null;
+  }
+
+  public async guardarCorte(corte: CorteCaja): Promise<CorteCaja> {
+    if (this.corteCajaRepo) {
+      return this.corteCajaRepo.actualizar(corte);
+    }
+    this.turnosEnMemoria.set(corte.id, corte);
+    return corte;
+  }
+
   public async buscarTurnoAbiertoPorDispositivo(dispositivoId: string): Promise<CorteCaja | null> {
     if (this.corteCajaRepo) {
       return this.corteCajaRepo.buscarTurnoAbiertoPorDispositivo(dispositivoId);
@@ -196,6 +211,8 @@ export class CorteCajaService {
       fechaCierre: corte.fechaCierre,
       montoApertura: corte.montoApertura,
       ventasAcumuladas: Math.round(ventasAcumuladas * 100) / 100,
+      totalIngresosExtra: corte.totalIngresosExtra,
+      totalEgresos: corte.totalEgresos,
       efectivoEsperado: corte.totalEfectivoEsperado,
       totalEfectivoContado: corte.totalEfectivoContado,
       diferencia: corte.diferencia,

@@ -1,4 +1,4 @@
-﻿import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Min, ValidateNested } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Min, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class OpenCashShiftDto {
@@ -52,6 +52,8 @@ export interface CashShiftResponseDto {
   fechaCierre?: Date | null;
   montoApertura: number;
   ventasAcumuladas: number;
+  totalIngresosExtra?: number;
+  totalEgresos?: number;
   efectivoEsperado: number;
   totalEfectivoContado?: number;
   diferencia?: number;
