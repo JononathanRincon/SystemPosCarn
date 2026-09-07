@@ -1,4 +1,4 @@
-﻿# AGENTS.md — PROTOCOLO OPERATIVO PARA AGENTES DE IA (ANTIGRAVITY / GEMINI)
+# AGENTS.md — PROTOCOLO OPERATIVO PARA AGENTES DE IA (ANTIGRAVITY / GEMINI)
 ## Sistema POS Multi-Sucursal para Carnicerías
 
 > **DIRECTIVA SUPREMA:** Este repositorio opera bajo un **Modo de Desarrollo Controlado, Seguro, Altamente Auditable y Profesional**. Cualquier instancia de agente de IA que inicie una sesión en este proyecto está **estrictamente obligada** a seguir este protocolo antes de ejecutar cualquier acción o escribir código.
@@ -16,10 +16,12 @@ graph TD
     STEP2 --> STEP3[3. Leer requerimiento en requirements.md]
     STEP3 --> STEP4[4. Leer esquema en design.md]
     STEP4 --> STEP5[5. Consultar skill en PLAN_IMPLEMENTACION.md]
-    STEP5 --> STEP6[6. Implementar código según Blast Radius]
-    STEP6 --> STEP7[7. Ejecutar tests automatizados - 100% verde]
-    STEP7 --> STEP8[8. Mutar checkboxes `[x]` sin borrar líneas]
-    STEP8 --> STEP9[9. Registrar entrada en AI_PROCESS.md]
+    STEP5 --> STEP6[6. Crear rama feature/TASK-XX desde develop]
+    STEP6 --> STEP7[7. Implementar código según Blast Radius]
+    STEP7 --> STEP8[8. Ejecutar tests automatizados - 100% verde]
+    STEP8 --> STEP9[9. Commit convencional y merge a develop]
+    STEP9 --> STEP10[10. Mutar checkboxes `[x]` sin borrar líneas]
+    STEP10 --> STEP11[11. Registrar entrada en AI_PROCESS.md]
 ```
 
 1. **Identificar la Fase Activa:** Abre [FASE_TRACKING.md](file:///c:/Users/Galiatech/Documents/SystemPosCarns/FASE_TRACKING.md). La primera fase o módulo que tenga `[ ] ⏳ En Progreso` es el foco actual del proyecto.
@@ -31,6 +33,9 @@ graph TD
    - Ve a [design.md](file:///c:/Users/Galiatech/Documents/SystemPosCarns/design.md) y consulta el esquema de base de datos, DTO, endpoint o patrón arquitectónico exacto de la tarea.
 5. **Invocación de Skills de `.agent/`:**
    - Consulta la tabla de mapeo de skills en [PLAN_IMPLEMENTACION.md](file:///c:/Users/Galiatech/Documents/SystemPosCarns/PLAN_IMPLEMENTACION.md) y aplica las directrices de la skill correspondiente (ej. `Anthropic-Cybersecurity-Skills-main` para seguridad, `talleros-backend-engineer` para transacciones, `supabase` para base de datos).
+6. **Aislamiento en Rama GitFlow:**
+   - Asegúrate de estar en `develop` actualizado (`git checkout develop`).
+   - Crea la rama de trabajo específica: `git checkout -b feature/TASK-<ID>-<nombre-descriptivo>`. Queda prohibido commitear directamente sobre `develop` o `main`.
 
 ---
 
@@ -80,3 +85,39 @@ Ningún agente puede dar por terminada una tarea ni avanzar a la siguiente sin c
 | `FASE_TRACKING.md` | **Quality Gate por Fases** | Actualizar tras completar módulos completos. |
 | `AI_PROCESS.md` | **Auditoría de IA** | Registrar cada interacción y reporte de testing. |
 | `SDD_POS_Carniceria.md` | **Maestro Consolidado Histórico** | Referencia global pasiva. |
+
+---
+
+## 6. Protocolo GitFlow Obligatorio para Agentes
+
+El repositorio sigue estrictamente el modelo **GitFlow**:
+
+### 6.1 Topología de Ramas
+- `main`: **Código de producción inmutable y blindado.** Solo recibe merges de ramas `release/*` o `hotfix/*`. Prohibido commitear directamente.
+- `develop`: **Rama de integración continua principal.** Es la rama base donde convergen todas las tareas terminadas y probadas.
+- `feature/TASK-<ID>-<nombre>`: **Rama de trabajo por micro-tarea.** Siempre nace desde `develop` y se reintegra a `develop` tras pasar el Quality Gate.
+- `release/vX.Y.Z`: Rama de estabilización previa a producción.
+- `hotfix/<nombre>`: Parche urgente de producción que nace de `main` y se reintegra tanto a `main` como a `develop`.
+
+### 6.2 Ciclo de Vida de una Tarea bajo GitFlow
+1. **Paso A: Creación de Rama de Feature**
+   ```bash
+   git checkout develop
+   git pull origin develop  # si aplica
+   git checkout -b feature/TASK-04-usuario-hashing
+   ```
+2. **Paso B: Commits Atómicos con Conventional Commits**
+   - Formato obligatorio: `<tipo>(<scope>): <descripción corta>`
+   - Tipos válidos: `feat`, `fix`, `test`, `refactor`, `docs`, `chore`.
+   - Ejemplo: `git commit -m "feat(auth): implementar hash de contraseñas con bcrypt y salt 10"`
+3. **Paso C: Verificación de Pruebas (Quality Gate)**
+   - Ejecutar la suite correspondiente: `npm run test -- auth.service.spec.ts`.
+   - **CONDICIÓN INQUEBRANTABLE:** Si 1 solo test falla, **queda prohibido hacer merge a `develop`**.
+4. **Paso D: Integración a `develop`**
+   ```bash
+   git checkout develop
+   git merge --no-ff feature/TASK-04-usuario-hashing -m "merge: feature/TASK-04-usuario-hashing a develop tras 100% tests en verde"
+   ```
+5. **Paso E: Registro en `AI_PROCESS.md`**
+   - Documentar la rama creada, el commit hash y el resultado cuantitativo de las pruebas.
+
