@@ -40,7 +40,7 @@
   - *Trazabilidad:* EARS-AUTH-02.
   - *Prueba Verificable:* Pruebas de expiración y refresh en `auth.service.spec.ts`.
 
-- [ ] **TASK-06: Validación Local de PIN POS y Bloqueo por Intentos Fallidos**
+- [x] **TASK-06: Validación Local de PIN POS y Bloqueo por Intentos Fallidos**
   - *Objetivo:* Implementar endpoint `/auth/pin-login` y lógica de bloqueo tras 3 intentos erróneos durante 60s.
   - *Trazabilidad:* EARS-AUTH-03, EARS-AUTH-04.
   - *Prueba Verificable:* `npm run test -- auth.guard.spec.ts`.

@@ -76,12 +76,12 @@ Este documento actúa como el **Quality Gate Oficial** del proyecto. Ninguna fas
 > **Criterio de Desbloqueo:** Fase 1 debe estar 100% aprobada.
 
 ### 2.1 Módulo Autenticación & Seguridad
-- [ ] ⏳ **Autenticación Básica Web y POS**
-  - [ ] Implementación de servicio de Auth (JWT + Refresh Tokens)
-  - [ ] Login offline por PIN de 4 dígitos para cajeros (Móvil y Web POS)
-  - [ ] Guards de roles y permisos
-  - [ ] **Pruebas Unitarias:** `Backend/tests/unit/auth/auth.service.spec.ts`
-  - [ ] **Pruebas de Seguridad/Guard:** `Backend/tests/unit/auth/auth.guard.spec.ts`
+- [x] ✅ **Autenticación Básica Web y POS**
+  - [x] Implementación de servicio de Auth (JWT + Refresh Tokens)
+  - [x] Login offline por PIN de 4 dígitos para cajeros (Móvil y Web POS)
+  - [x] Guards de roles y permisos
+  - [x] **Pruebas Unitarias:** `Backend/tests/unit/auth/auth.service.spec.ts`
+  - [x] **Pruebas de Seguridad/Guard:** `Backend/tests/unit/auth/auth.guard.spec.ts`
 
 ### 2.2 Módulo Catálogo & Multi-Tenant
 - [ ] ⏳ **Aislamiento de Negocio y Sucursal**

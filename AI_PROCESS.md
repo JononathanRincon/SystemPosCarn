@@ -263,3 +263,114 @@ PLANTILLA ESQUELETO PARA NUEVAS ENTRADAS
   - `tasks.md` (TASK-05 marcada con `[x]`)
   - `PLAN_IMPLEMENTACION.md` (Punto 2.1.2 marcado con `[x]`)
   - `AI_PROCESS.md` (Bitácora registrada)
+
+---
+
+## Entrada 6
+
+- **Fecha:** 2026-09-07
+- **Modelo/herramienta:** Antigravity (Gemini 3.8 Flash)
+- **Prompt utilizado (completo):**
+  ```text
+  /goal Ejecuta el Loop Engineering para las tarea task 6. Actúa como Staff Software Engineer bajo el protocolo estricto de AGENTS.md, GitFlow y Loop Engineering.
+
+  Vamos a retomar el desarrollo del proyecto "Sistema POS Multi-Sucursal para Carnicerías" directamente en la tarea TASK-06 del Bloque 2:
+
+  ### 1. Contexto Quirúrgico Just-In-Time (TASK-06):
+  - Tarea activa en tasks.md: [ ] TASK-06: Validación Local de PIN POS y Bloqueo por Intentos Fallidos.
+  - Requisitos en requirements.md: 
+    - EARS-AUTH-03: Validación de PIN POS de 4 dígitos contra el hash del usuario asignado a la sucursal.
+    - EARS-AUTH-04: Si el usuario ingresa un PIN incorrecto más de 3 veces consecutivas, bloquear el acceso durante 60 segundos (HTTP 429 Too Many Requests).
+  - Especificación en design.md:
+    - Sección 7.1 (Endpoint 3): POST /auth/pin-login con payload { sucursalId, pin, dispositivoId } retornando { valid: true, user, sessionToken }.
+    - Sección 14.1 (RBAC) y 14.2 (Throttling / Protección contra fuerza bruta).
+  - Skills activas en PLAN_IMPLEMENTACION.md: .agent/Anthropic-Cybersecurity-Skills-main y .agent/talleros-backend-engineer.
+
+  ### 2. Aislamiento GitFlow:
+  - Asegúrate de estar en la rama base: git checkout develop.
+  - Crea la rama de feature específica: git checkout -b feature/TASK-06-pin-login-bloqueo develop.
+
+  ### 3. Loop Engineering (Bucle Interno — TDD y Auto-Sanación):
+  - Implementa en Backend/src/modules/auth/:
+    1. DTO PinLoginDto con validación de PIN (exactamente 4 dígitos numéricos) y UUIDs (sucursalId, dispositivoId).
+    2. Servicio y lógica de validación de PIN y control de intentos fallidos en memoria/cache (máximo 3 intentos; al 4to intento arroja excepción con tiempo restante de bloqueo de 60s).
+    3. Endpoint POST /auth/pin-login en AuthController.
+    4. Guard de autorización por roles (RolesGuard / PermissionsGuard) para proteger rutas según la matriz RBAC.
+  - Ejecuta la prueba automatizada verificable: npm test --prefix Backend -- auth.guard.spec.ts
+  - Auto-Corrección Autónoma: Si la prueba falla, analiza la salida de la consola, ajusta el código y re-ejecuta el test sin intervención humana (hasta 3 reintentos).
+
+  ### 4. Bucle Externo (Quality Gate e Integración):
+  - Solo cuando el 100% de las pruebas estén en verde:
+    1. Realiza commit convencional: git commit -m "feat(auth): implementar endpoint pin-login con bloqueo tras 3 intentos fallidos y roles guard".
+    2. Regresa e integra a develop: git checkout develop && git merge --no-ff feature/TASK-06-pin-login-bloqueo -m "merge: feature/TASK-06-pin-login-bloqueo a develop tras 100% tests en verde".
+    3. Muta el checkbox de [ ] a [x] en tasks.md respetando la regla de inmutabilidad (no borrar líneas).
+    4. Registra la bitácora completa en AI_PROCESS.md con prompt, respuesta, commit y reporte cuantitativo de pruebas.
+  ```
+- **Output del agente / Respuesta de la herramienta (resumen ejecutivo):**
+  ```text
+  TASK-06 completada con éxito bajo protocolo estricto GitFlow y Loop Engineering:
+  - DTO PinLoginDto creado con validación de PIN (exactamente 4 dígitos numéricos), UUIDs de sucursal y dispositivoId, y userId opcional.
+  - Creado PinThrottlerService con mitigación de fuerza bruta en memoria (máximo 3 intentos; bloqueo de 60s al 4to intento fallido consecutivo con HTTP 429 Too Many Requests y cálculo dinámico de remainingSeconds).
+  - Implementado endpoint POST /auth/pin-login en AuthController y AuthService, generando sessionToken con TTL de 12 horas para mostrador POS.
+  - Implementados Guards RBAC: AuthGuard (validación de Bearer token y soporte @Public), RolesGuard (autorización por roles según metadata @Roles) y PermissionsGuard (matriz de permisos canónica según design.md sec. 14.1).
+  - Auto-sanación en bucle interno para mantener retrocompatibilidad polimórfica en AuthService y evitar regresiones en auth.service.spec.ts.
+  - Suite auth.guard.spec.ts completada con 24 tests unitarios en verde (100%) y auth.service.spec.ts con 15 tests unitarios en verde (100%).
+  - Commit convencional en rama feature/TASK-06-pin-login-bloqueo y merge no-fast-forward a develop.
+  - Mutación inmutable de checkboxes en tasks.md, FASE_TRACKING.md (Módulo 2.1 cerrado al 100%) y PLAN_IMPLEMENTACION.md.
+  ```
+- **Acciones de Git:**
+  - Rama feature: `feature/TASK-06-pin-login-bloqueo` (creada desde `develop`)
+  - Commit atómico feature: `03cc00f feat(auth): implementar endpoint pin-login con bloqueo tras 3 intentos fallidos y roles guard`
+  - Merge a develop: `0796c4d merge: feature/TASK-06-pin-login-bloqueo a develop tras 100% tests en verde`
+- **Reporte de pruebas automatizadas:**
+  | Suite / Nivel | Total | ✅ Pasaron | ❌ Fallaron | Cobertura (%) |
+  |---|---|---|---|---|
+  | Unitarias (auth.guard) | 24 | 24 | 0 | 100% |
+  | Unitarias (auth.service) | 15 | 15 | 0 | 100% |
+  | **Total Módulo Auth** | **39** | **39** | **0** | **100%** |
+- **Lista detallada de pruebas ejecutadas:**
+  - [x] `auth.guard.spec.ts`: AuthGuard: Acceso inmediato en rutas con @Public().
+  - [x] `auth.guard.spec.ts`: AuthGuard: UnauthorizedException ante ausencia de cabecera Authorization.
+  - [x] `auth.guard.spec.ts`: AuthGuard: UnauthorizedException si el esquema no es Bearer.
+  - [x] `auth.guard.spec.ts`: AuthGuard: UnauthorizedException si el token es corrupto/inválido.
+  - [x] `auth.guard.spec.ts`: AuthGuard: Inyección de request.user y retorno true ante Access Token válido.
+  - [x] `auth.guard.spec.ts`: RolesGuard: Acceso permitido si la ruta no tiene restricción de roles.
+  - [x] `auth.guard.spec.ts`: RolesGuard: UnauthorizedException si no hay usuario en request.
+  - [x] `auth.guard.spec.ts`: RolesGuard: Acceso permitido al coincidir rol requerido (Cajero).
+  - [x] `auth.guard.spec.ts`: RolesGuard: Administrador/Dueño cuenta con acceso superusuario en roles menores.
+  - [x] `auth.guard.spec.ts`: RolesGuard: ForbiddenException si un Cajero intenta acceder a recursos de Administrador o Gerente.
+  - [x] `auth.guard.spec.ts`: PermissionsGuard: Cajero accede a permisos asignados (pos.login_pin, ventas.registrar, caja.turno).
+  - [x] `auth.guard.spec.ts`: PermissionsGuard: Cajero es denegado con ForbiddenException ante anulación de venta o merma.
+  - [x] `auth.guard.spec.ts`: PermissionsGuard: Gerente Sucursal accede a anulación de venta, pesaje manual, merma y recepciones.
+  - [x] `auth.guard.spec.ts`: PermissionsGuard: Gerente Sucursal es denegado ante modificación de precios de catálogo o métricas multi-sucursal.
+  - [x] `auth.guard.spec.ts`: PermissionsGuard: Administrador cuenta con acceso total a toda la matriz RBAC.
+  - [x] `auth.guard.spec.ts`: PinThrottlerService & EARS-AUTH-04: Primeros 3 intentos fallidos consecutivos permitidos sin bloqueo.
+  - [x] `auth.guard.spec.ts`: PinThrottlerService & EARS-AUTH-04: Bloqueo de acceso por 60 segundos al 4to intento consecutivo con HTTP 429 Too Many Requests y remainingSeconds.
+  - [x] `auth.guard.spec.ts`: PinThrottlerService & EARS-AUTH-04: Mantenimiento del bloqueo activo con HTTP 429 durante el periodo de penalización.
+  - [x] `auth.guard.spec.ts`: PinThrottlerService & EARS-AUTH-04: Restablecimiento de intentos fallidos al llamar a resetAttempts().
+  - [x] `auth.guard.spec.ts`: AuthService.pinLogin & AuthController: Autenticación exitosa con PIN de 4 dígitos retornando { valid: true, user, sessionToken }.
+  - [x] `auth.guard.spec.ts`: AuthService.pinLogin & AuthController: Rechazo con BadRequestException si el PIN no tiene exactamente 4 dígitos numéricos.
+  - [x] `auth.guard.spec.ts`: AuthService.pinLogin & AuthController: Rechazo con UnauthorizedException (HTTP 401) ante PIN incorrecto.
+  - [x] `auth.guard.spec.ts`: AuthService.pinLogin & AuthController: Bloqueo con HttpException (HTTP 429) al 4to fallo consecutivo.
+  - [x] `auth.guard.spec.ts`: AuthService.pinLogin & AuthController: Reinicio del contador de fallos tras ingreso de PIN correcto.
+  - [x] `auth.service.spec.ts`: 15 pruebas completas de hashing (bcrypt salt 10+, PIN 4 dígitos, entidades, JWT 15m/7d, rotación segura y login web).
+- **Estado de Funcionalidad / Fase:** ✅ Realizada y Probada (Módulo 2.1 Autenticación & Seguridad completado al 100%, siguiente: Bloque 3 / Módulo 2.2 Catálogo & Multi-Tenant - TASK-07).
+- **Qué se generó / modificó:**
+  - `Backend/src/modules/auth/application/dtos/auth.dto.ts` (Actualizado con PinLoginDto y PinLoginResponseDto)
+  - `Backend/src/modules/auth/application/services/pin-throttler.service.ts` (Nuevo)
+  - `Backend/src/modules/auth/presentation/guards/roles.decorator.ts` (Nuevo)
+  - `Backend/src/modules/auth/presentation/guards/permissions.decorator.ts` (Nuevo)
+  - `Backend/src/modules/auth/presentation/guards/auth.guard.ts` (Nuevo)
+  - `Backend/src/modules/auth/presentation/guards/roles.guard.ts` (Nuevo)
+  - `Backend/src/modules/auth/presentation/guards/permissions.guard.ts` (Nuevo)
+  - `Backend/src/modules/auth/domain/ports/usuario-repository.port.ts` (Actualizado con métodos de sucursal)
+  - `Backend/src/modules/auth/application/services/auth.service.ts` (Actualizado con pinLogin, control de bloqueo y retrocompatibilidad)
+  - `Backend/src/modules/auth/application/services/token.service.ts` (Actualizado con generateSessionToken y verifyToken)
+  - `Backend/src/modules/auth/presentation/http/auth.controller.ts` (Actualizado con endpoint POST /auth/pin-login)
+  - `Backend/src/modules/auth/auth.module.ts` (Actualizado con providers y guards exportados)
+  - `Backend/tests/unit/auth/auth.guard.spec.ts` (Actualizado con suite completa de 24 pruebas unitarias)
+  - `tasks.md` (TASK-06 marcada con `[x]`)
+  - `FASE_TRACKING.md` (Módulo 2.1 marcado con `[x] ✅`)
+  - `PLAN_IMPLEMENTACION.md` (Items 2.1.3 y 2.1.4 marcados con `[x]`)
+  - `AI_PROCESS.md` (Bitácora Entrada 6 registrada)
+

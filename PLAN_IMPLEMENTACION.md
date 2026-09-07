@@ -44,8 +44,8 @@ Para asegurar la máxima calidad sin degradar la memoria del agente, cada fase y
 ### 2.1 Módulo Autenticación, Seguridad y RBAC
 - [x] **2.1.1 Modelo de Usuarios y Hashing de Contraseñas:** Servicio con `bcrypt` (salt factor 10+) para web y hash para PIN POS de 4 dígitos.
 - [x] **2.1.2 Emisión y Rotación de Tokens JWT:** Endpoints `/auth/login` y `/auth/refresh` con cookies `HttpOnly`, `Secure`, `SameSite=Strict`.
-- [ ] **2.1.3 Autenticación Offline por PIN y Throttling:** Endpoint `/auth/pin-login` con bloqueo tras 3 intentos fallidos durante 60 segundos.
-- [ ] **2.1.4 Sistema de Autorización Basado en Roles (RBAC):** Guards granulares (`RolesGuard`, `PermissionsGuard`) para cajero, gerente y administrador.
+- [x] **2.1.3 Autenticación Offline por PIN y Throttling:** Endpoint `/auth/pin-login` con bloqueo tras 3 intentos fallidos durante 60 segundos.
+- [x] **2.1.4 Sistema de Autorización Basado en Roles (RBAC):** Guards granulares (`RolesGuard`, `PermissionsGuard`) para cajero, gerente y administrador.
 
 ### 2.2 Módulo Multi-Tenant y Catálogo Avanzado
 - [ ] **2.2.1 Aislamiento Multi-Tenant Estricto:** Middleware de extracción de `tenant_id` y aplicación forzada de políticas RLS en Supabase.
