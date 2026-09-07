@@ -1082,6 +1082,86 @@ PLANTILLA ESQUELETO PARA NUEVAS ENTRADAS
   - `Backend/src/modules/inventory/application/listeners/inventory-event.listener.ts`
   - `Backend/tests/unit/events/event-emitter.spec.ts`
 
+---
+
+## Entrada 19
+
+- **Fecha:** 2026-09-07
+- **Modelo/herramienta:** Antigravity (Gemini 3.8 Flash)
+- **Prompt utilizado:**
+  ```text
+  /goal Actúa como Staff Software Engineer bajo el protocolo estricto de AGENTS.md, GitFlow y Loop Engineering.
+  1. Kickoff de Bloque (Contexto Just-in-Time Quirúrgico):
+     - design.md: Sección 1.3 (Patrones de Acceso Fan-out / Redis Cache-Aside) y Sección 9.1 (Namespaces de Claves en Redis).
+     - requirements.md: Historia de Usuario US-11 (Actualización y distribución automática de precios).
+     - PLAN_IMPLEMENTACION.md: Mapeo de skills para el Bloque 8 (.agent/talleros-backend-engineer y .agent/supabase-postgres-best-practices).
+  2. Aislamiento GitFlow:
+     - git checkout develop && git pull origin develop
+     - git checkout -b feature/TASK-18-redis-cache-aside-catalogo
+  3. Implementación (TASK-18: Cache-Aside de Catálogo en Redis e Invalidación Reactiva):
+     - Servicio / Adaptador de Caché Redis con fallback seguro en memoria.
+     - Namespace canónico: catalog:sucursal:{sucursalId} con TTL configurable por defecto de 3600 segundos (1 hora).
+     - Patrón Cache-Aside en Catálogo: ProductoService.obtenerCatalogoPorSucursal (< 15ms en hit).
+     - Invalidación Proactiva y Reactiva: del en mutaciones y @OnEvent('catalogo.modificado').
+  4. Quality Gate:
+     - tests/unit/catalog/catalog-cache.spec.ts pasando al 100% en verde.
+     - Regresión total pasando al 100% en verde.
+     - Commit convencional, merge no-ff a develop y mutación inmutable de checkboxes.
+  ```
+- **Output del agente / Respuesta de la herramienta (resumen ejecutivo):**
+  ```text
+  TASK-18 completada con éxito bajo protocolo estricto GitFlow y Loop Engineering, cerrando el Bloque 8 al 100%:
+  - Dependencias instaladas: ioredis y @types/ioredis integrados en Backend/package.json.
+  - Servicio RedisCacheService implementado en Backend/src/common/cache/redis-cache.service.ts:
+    * Namespace canónico: catalog:sucursal:{sucursalId} con TTL de 3600s (1 hora) según design.md Sec. 1.3 y 9.1.
+    * Conexión con lazyConnect, retryStrategy acotada y fallback transparente en memoria (Map con timestamps de expiración) para desarrollo/tests o si Redis no está disponible.
+    * Métodos get, set, del, delPattern (con scanStream no bloqueante) y clear.
+    * Resiliencia total ante desconexión o errores transitorios de Redis sin interrumpir peticiones HTTP (cero 500 al cliente).
+  - CacheModule global implementado en Backend/src/common/cache/cache.module.ts.
+  - Patrón Cache-Aside en ProductoService.obtenerCatalogoPorSucursal():
+    * 1. Consulta clave en Redis (Cache Hit < 15ms).
+    * 2. Cache Miss: consulta primaria en base de datos PostgreSQL/repositorio, serialización a JSON, almacenamiento en Redis con TTL 3600s y retorno.
+  - Invalidación Proactiva y Reactiva implementada:
+    * Invalidación proactiva directa en ProductoService (create, update, deactivate, delete, cambiarPrecio) y CategoriaService (create, update, delete).
+    * Evento de dominio CatalogoModificadoEvent ('catalogo.modificado') emitido en cada cambio de catálogo o precio (US-11).
+    * Escuchador reactivo CatalogCacheListener con @OnEvent('catalogo.modificado') que elimina la clave de la sucursal o invalida el patrón 'catalog:sucursal:*'.
+  - Endpoint de cambio de precio PATCH /products/:id/price y de catálogo por sucursal GET /products/branch/:branchId en ProductsController.
+  - Suites de pruebas automatizadas al 100% en verde:
+    * tests/unit/catalog/catalog-cache.spec.ts: 8 tests pasando al 100% en verde.
+    * Regresión completa de 28 suites y 167 tests pasando al 100% en verde en 26.06s.
+  - GitFlow: commit atómico a3ae391 en feature/TASK-18-redis-cache-aside-catalogo y merge no-ff e9ceeb5 a develop.
+  - Mutación inmutable de checkboxes en tasks.md (Bloque 8 cerrado al 100%), FASE_TRACKING.md y PLAN_IMPLEMENTACION.md.
+  ```
+- **Acciones de Git:**
+  - Rama feature: `feature/TASK-18-redis-cache-aside-catalogo` (creada desde `develop`)
+  - Commit atómico feature: `a3ae391 feat(catalog): implementar cache-aside de catalogo en Redis con invalidacion reactiva`
+  - Merge a develop: `e9ceeb5 merge: feature/TASK-18-redis-cache-aside-catalogo a develop tras 100% tests en verde`
+- **Reporte de pruebas automatizadas:**
+  | Suite / Nivel | Total | ✅ Pasaron | ❌ Fallaron | Cobertura (%) |
+  |---|---|---|---|---|
+  | Unitarias (catalog-cache.spec) | 8 | 8 | 0 | 100% |
+  | **Total Backend Completo (28 Suites)** | **167** | **167** | **0** | **100%** |
+- **Lista detallada de pruebas ejecutadas:**
+  - [x] `catalog-cache.spec.ts`: Consulta a base de datos en Cache Miss inicial y poblado de Redis con TTL 3600s.
+  - [x] `catalog-cache.spec.ts`: Retorno de datos cacheados en Cache Hit posterior sin consultar base de datos.
+  - [x] `catalog-cache.spec.ts`: Invalidación inmediata de clave al actualizar precio de producto (US-11).
+  - [x] `catalog-cache.spec.ts`: Invalidación inmediata de clave al crear un nuevo producto.
+  - [x] `catalog-cache.spec.ts`: Invalidación de clave al desactivar o eliminar un producto.
+  - [x] `catalog-cache.spec.ts`: Invalidación de clave al crear o actualizar una categoría.
+  - [x] `catalog-cache.spec.ts`: Invalidación reactiva desacoplada al emitir CatalogoModificadoEvent en EventEmitter2.
+  - [x] `catalog-cache.spec.ts`: Resiliencia y fallback transparente a base de datos si Redis.get() lanza error.
+  - [x] `catalog-cache.spec.ts`: Continuidad de servicio sin error si Redis.set() falla.
+  - [x] Regresión completa de 28 suites y 167 tests pasando al 100%.
+- **Estado de Funcionalidad / Fase:** ✅ Realizada y Probada (Bloque 8 completado al 100%, siguiente: Bloque 9 Ciberseguridad Avanzada, Throttling y Observabilidad).
+- **Qué se generó:**
+  - `Backend/src/common/cache/redis-cache.service.ts`
+  - `Backend/src/common/cache/cache.module.ts`
+  - `Backend/src/common/cache/index.ts`
+  - `Backend/src/modules/catalog/domain/events/catalogo-modificado.event.ts`
+  - `Backend/src/modules/catalog/application/listeners/catalog-cache.listener.ts`
+  - `Backend/tests/unit/catalog/catalog-cache.spec.ts`
+
+
 
 
 

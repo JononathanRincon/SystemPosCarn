@@ -130,7 +130,7 @@
   - *Trazabilidad:* `design.md` Sec. 8.
   - *Prueba Verificable:* `npm run test -- event-emitter.spec.ts`.
 
-- [ ] **TASK-18: Cache-Aside de Catálogo en Redis e Invalidación Reactiva**
+- [x] **TASK-18: Cache-Aside de Catálogo en Redis e Invalidación Reactiva**
   - *Objetivo:* Cachear catálogo por sucursal en Redis con TTL 1h e invalidación proactiva al mutar productos o categorías.
   - *Trazabilidad:* `design.md` Sec. 1.3 y 9.1.
   - *Prueba Verificable:* `npm run test -- catalog-cache.spec.ts`.

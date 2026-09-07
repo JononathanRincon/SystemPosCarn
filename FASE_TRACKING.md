@@ -166,11 +166,11 @@ Este documento actúa como el **Quality Gate Oficial** del proyecto. Ninguna fas
   - [x] **Pruebas de Integración:** `Backend/tests/integration/dashboard.integration.spec.ts`
 
 ### 2.9 Módulo Eventos de Dominio (DDD) y Caché Redis
-- [ ] ⏳ **Desacoplamiento y Rendimiento**
+- [x] ✅ **Desacoplamiento y Rendimiento**
   - [x] Bus de eventos `EventEmitter2` implementado
-  - [ ] Patrón Cache-Aside en Redis para catálogo por sucursal
-  - [ ] Invalidación proactiva de caché ante cambios
-  - [ ] **Pruebas Unitarias:** `Backend/tests/unit/common/events.spec.ts`
+  - [x] Patrón Cache-Aside en Redis para catálogo por sucursal
+  - [x] Invalidación proactiva de caché ante cambios
+  - [x] **Pruebas Unitarias:** `Backend/tests/unit/common/events.spec.ts`
 
 ### 2.10 Módulo Ciberseguridad Avanzada y Observabilidad
 - [ ] ⏳ **Hardening y Monitoreo**
