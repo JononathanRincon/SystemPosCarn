@@ -7,6 +7,17 @@ import type { POSDatabase, VentaOutbox, VentaOutboxStatus } from '@/lib/db/pos-d
  * hasta que el motor de sincronización las envíe al endpoint /sales/sync.
  */
 
+let lastTimestamp = 0;
+
+function getMonotonicIsoString(): string {
+  let now = Date.now();
+  if (now <= lastTimestamp) {
+    now = lastTimestamp + 1;
+  }
+  lastTimestamp = now;
+  return new Date(now).toISOString();
+}
+
 /**
  * Encola una venta generada en mostrador con estado 'pending'.
  *
@@ -25,7 +36,7 @@ export async function encolarVentaOutbox(
     id,
     payload: JSON.stringify(ventaPayload),
     status: 'pending',
-    createdAt: new Date().toISOString(),
+    createdAt: getMonotonicIsoString(),
   };
 
   await db.ventas_outbox.add(entry);
