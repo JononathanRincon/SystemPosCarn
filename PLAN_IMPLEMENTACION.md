@@ -78,8 +78,8 @@ Para asegurar la máxima calidad sin degradar la memoria del agente, cada fase y
 
 ### 2.7 Módulo de Observabilidad y API de Dashboards
 - [ ] **2.7.1 Logs Canónicos y Correlation IDs:** Middleware de `pino-http` inyectando `X-Correlation-ID` en cada petición y log JSON.
-- [ ] **2.7.2 Endpoint `/dashboard/owner`:** Métricas consolidadas de ventas, márgenes brutos, ranking de productos y comparativo de sedes.
-- [ ] **2.7.3 Endpoint `/dashboard/manager`:** Resumen operativo de la sucursal activa (caja, mermas, stock crítico).
+- [x] **2.7.2 Endpoint `/dashboard/owner`:** Métricas consolidadas de ventas, márgenes brutos, ranking de productos y comparativo de sedes.
+- [x] **2.7.3 Endpoint `/dashboard/manager`:** Resumen operativo de la sucursal activa (caja, mermas, stock crítico).
 
 ---
 

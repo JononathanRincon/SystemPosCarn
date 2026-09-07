@@ -931,4 +931,78 @@ PLANTILLA ESQUELETO PARA NUEVAS ENTRADAS
   - `PLAN_IMPLEMENTACION.md` (Actualizado en 2.5.3)
   - `AI_PROCESS.md` (Entrada 16 auditada)
 
+---
+
+## Entrada 17
+
+- **Fecha:** 2026-09-07
+- **Modelo/herramienta:** Antigravity (Gemini 3.8 Flash)
+- **Prompt utilizado (completo):**
+  ```text
+  /goal Inicia la ejecución de TASK-16 (Bloque 7: Backend — Dashboard API de Métricas) bajo el protocolo de AGENTS.md:
+  1. Aislamiento GitFlow: git checkout develop; git checkout -b feature/TASK-16-dashboard-api-metricas
+  2. Implementación en Backend/src/modules/dashboard/:
+     - Endpoint GET /dashboard/owner (EARS-DASH-01, US-13): Métricas de ventas del día, ticket promedio, margen bruto estimado, gráfico de métodos de pago, comparativo entre sucursales activas, syncTimestamp.
+     - Endpoint GET /dashboard/manager (EARS-DASH-02, US-14): Resumen operativo de la sucursal activa, estado actual de caja y ventas por cajero, top productos cárnicos vendidos, alertas de lotes próximos a vencer (<= 3 días) y stock crítico.
+  3. Pruebas Automatizadas (Quality Gate):
+     - Backend/tests/unit/dashboard/dashboard.service.spec.ts
+     - Backend/tests/integration/dashboard.integration.spec.ts
+     - Cobertura 100% en verde.
+  4. Cierre: Commit convencional y merge no-ff a develop. Mutar [ ] a [x] en tasks.md y registrar en AI_PROCESS.md.
+  ```
+- **Output del agente / Respuesta de la herramienta (resumen ejecutivo):**
+  ```text
+  TASK-16 completada con éxito bajo protocolo estricto GitFlow y Loop Engineering, cerrando el Bloque 7 al 100%:
+  - Módulo DashboardModule implementado en Backend/src/modules/dashboard/:
+    * DTOs DashboardOwnerResponseDto, MetricasVentasOwnerDto, VentasPorMetodoPagoDto, ComparativoSucursalDto, TopProductoOwnerDto con tipado estricto.
+    * DTOs DashboardManagerResponseDto, EstadoCajaActualDto, ResumenVentasCajeroDto, TopProductoManagerDto con desglose de caja y mermas.
+    * Servicio DashboardService:
+      - Agregaciones deterministas de ventas de hoy y ayer.
+      - Cálculo de margen bruto real considerando costo promedio de catálogo (con fallback del 65% en base).
+      - Comparativo multi-sucursal con participación porcentual de ventas.
+      - Desglose consolidado de formas de pago (efectivo, tarjeta, transferencias).
+      - Integración de estado de turno de caja (abierta, cerrada, sin_turno) y ventas por cajero.
+      - Integración con InventarioService para alertas de stock crítico y lotes por vencer (<= 3 días).
+      - Integración con MermaService para mermas operativas del día.
+      - Propiedad obligatoria syncTimestamp en formato ISO 8601 (EARS-DASH-01).
+    * Controlador DashboardController:
+      - GET /dashboard/owner protegido con @Roles('dueno', 'administrador')
+      - GET /dashboard/manager protegido con @Roles('dueno', 'administrador', 'gerente') y validación de sucursalId.
+  - Suites de pruebas automatizadas al 100% en verde:
+    * tests/unit/dashboard/dashboard.service.spec.ts: 3 tests pasando.
+    * tests/integration/dashboard.integration.spec.ts: 3 tests pasando.
+    * Regresión completa de 26 suites y 152 tests pasando al 100% en verde en 23.97s.
+  - GitFlow: commit 758f2a5 en feature/TASK-16-dashboard-api-metricas y merge no-ff a develop (commit 7203b51 / merge commit).
+  - Mutación inmutable de checkboxes en tasks.md, FASE_TRACKING.md y PLAN_IMPLEMENTACION.md.
+  ```
+- **Acciones de Git:**
+  - Rama feature: `feature/TASK-16-dashboard-api-metricas` (creada desde `develop`)
+  - Commit atómico feature: `758f2a5 feat(dashboard): implementar endpoints de metricas para dueno y gerente con syncTimestamp`
+  - Merge a develop: Merge no-ff a `develop`
+- **Reporte de pruebas automatizadas:**
+  | Suite / Nivel | Total | ✅ Pasaron | ❌ Fallaron | Cobertura (%) |
+  |---|---|---|---|---|
+  | Unitarias (dashboard.service) | 3 | 3 | 0 | 100% |
+  | Integración (dashboard.integration) | 3 | 3 | 0 | 100% |
+  | **Total Backend Completo (26 Suites)** | **152** | **152** | **0** | **100%** |
+- **Lista detallada de pruebas ejecutadas:**
+  - [x] `dashboard.service.spec.ts`: Cálculo de ventas agregadas de hoy, ticket promedio, costo total y margen bruto (EARS-DASH-01, US-13).
+  - [x] `dashboard.service.spec.ts`: Desglose porcentual por método de pago y comparativa entre sedes.
+  - [x] `dashboard.service.spec.ts`: Comparativa de ventas de hoy contra ayer.
+  - [x] `dashboard.service.spec.ts`: Resumen operativo por sucursal, estado de caja, ventas por cajero y mermas de hoy (EARS-DASH-02, US-14).
+  - [x] `dashboard.integration.spec.ts`: Endpoint GET /dashboard/owner con autenticación de rol y respuesta canónica.
+  - [x] `dashboard.integration.spec.ts`: Endpoint GET /dashboard/manager con resolución de turno de caja y filtros.
+  - [x] `dashboard.integration.spec.ts`: Validación y rechazo con BadRequestException si no se indica sucursalId.
+  - [x] Regresión completa de 26 suites y 152 tests pasando al 100%.
+- **Estado de Funcionalidad / Fase:** ✅ Realizada y Probada (Bloque 7 / Módulo 2.8 Dashboards y Analítica completado al 100%, siguiente: TASK-13B o Bloque 8 Eventos de Dominio).
+- **Qué se generó:**
+  - `Backend/src/modules/dashboard/application/dtos/dashboard-owner.dto.ts`
+  - `Backend/src/modules/dashboard/application/dtos/dashboard-manager.dto.ts`
+  - `Backend/src/modules/dashboard/application/services/dashboard.service.ts`
+  - `Backend/src/modules/dashboard/presentation/http/dashboard.controller.ts`
+  - `Backend/src/modules/dashboard/dashboard.module.ts`
+  - `Backend/tests/unit/dashboard/dashboard.service.spec.ts`
+  - `Backend/tests/integration/dashboard.integration.spec.ts`
+
+
 

@@ -115,7 +115,7 @@
 
 ## Bloque 7: Backend — Dashboard API de Métricas
 
-- [ ] **TASK-16: Endpoints de Dashboard para Dueño y Gerente**
+- [x] **TASK-16: Endpoints de Dashboard para Dueño y Gerente**
   - *Objetivo:* Crear endpoints `/dashboard/owner` (ventas, márgenes, comparativo) y `/dashboard/manager` (operación sucursal) con timestamp de sync.
   - *Trazabilidad:* EARS-DASH-01, EARS-DASH-02, US-13, US-14.
   - *Prueba Verificable:* Tests de integración de dashboard con datos agregados.

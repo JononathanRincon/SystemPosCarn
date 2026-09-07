@@ -158,12 +158,12 @@ Este documento actúa como el **Quality Gate Oficial** del proyecto. Ninguna fas
   - [x] **Pruebas de Integración:** `Backend/tests/integration/lote-fefo.integration.spec.ts`
 
 ### 2.8 Módulo Dashboard (API de Reportes)
-- [ ] ⏳ **Dashboard del Dueño y Gerente**
-  - [ ] Endpoint `/dashboard/owner`: ventas consolidadas, márgenes, alertas, comparativo
-  - [ ] Endpoint `/dashboard/manager`: resumen operativo por sucursal
-  - [ ] Queries de agregación optimizadas (índices, materialización parcial)
-  - [ ] **Pruebas Unitarias:** `Backend/tests/unit/dashboard/dashboard.service.spec.ts`
-  - [ ] **Pruebas de Integración:** `Backend/tests/integration/dashboard.integration.spec.ts`
+- [x] ✅ **Dashboard del Dueño y Gerente**
+  - [x] Endpoint `/dashboard/owner`: ventas consolidadas, márgenes, alertas, comparativo
+  - [x] Endpoint `/dashboard/manager`: resumen operativo por sucursal
+  - [x] Queries de agregación optimizadas (índices, materialización parcial)
+  - [x] **Pruebas Unitarias:** `Backend/tests/unit/dashboard/dashboard.service.spec.ts`
+  - [x] **Pruebas de Integración:** `Backend/tests/integration/dashboard.integration.spec.ts`
 
 ### 2.9 Módulo Eventos de Dominio (DDD) y Caché Redis
 - [ ] ⏳ **Desacoplamiento y Rendimiento**
