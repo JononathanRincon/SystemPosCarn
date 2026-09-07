@@ -125,7 +125,7 @@
 ## Bloque 8: Backend — Eventos de Dominio (DDD) y Caché Redis
 *Skills:* `.agent/talleros-backend-engineer`, `.agent/supabase-postgres-best-practices`
 
-- [ ] **TASK-17: Bus de Eventos en Memoria (`EventEmitter2`)**
+- [x] **TASK-17: Bus de Eventos en Memoria (`EventEmitter2`)**
   - *Objetivo:* Desacoplar ventas e inventario mediante eventos de dominio (`VentaCompletadaEvent`, `VentaAnuladaEvent`, `RecepcionCreadaEvent`).
   - *Trazabilidad:* `design.md` Sec. 8.
   - *Prueba Verificable:* `npm run test -- event-emitter.spec.ts`.

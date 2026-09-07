@@ -1004,5 +1004,84 @@ PLANTILLA ESQUELETO PARA NUEVAS ENTRADAS
   - `Backend/tests/unit/dashboard/dashboard.service.spec.ts`
   - `Backend/tests/integration/dashboard.integration.spec.ts`
 
+---
+
+## Entrada 18
+
+- **Fecha:** 2026-09-07
+- **Modelo/herramienta:** Antigravity (Gemini 3.8 Flash)
+- **Prompt utilizado:**
+  ```text
+  /goal Actúa como Staff Software Engineer bajo el protocolo estricto de AGENTS.md, GitFlow y Loop Engineering.
+  1. Kickoff de Bloque (Contexto Just-in-Time Quirúrgico):
+     - design.md: Sección 8 (Arquitectura de Eventos de Dominio DDD en Memoria).
+     - requirements.md: Requisitos de eventos EARS-INV-02, EARS-LOTE-02 y EARS-LOTE-05.
+     - PLAN_IMPLEMENTACION.md: Mapeo de skills para el Bloque 8.
+  2. Aislamiento GitFlow:
+     - git checkout develop && git pull origin develop
+     - git checkout -b feature/TASK-17-bus-eventos-dominio
+  3. Implementación (TASK-17: Bus de Eventos en Memoria - EventEmitter2):
+     - Configurar @nestjs/event-emitter en EventsModule global.
+     - Eventos de Dominio: VentaCompletadaEvent, VentaAnuladaEvent, RecepcionCreadaEvent.
+     - Publicadores en VentaService (crearVenta, anularVenta) e InventarioService (registrarRecepcion).
+     - Escuchador InventoryEventListener con @OnEvent para despacho FEFO automático, reversión de deltas/lotes y alerta de cadena de frío (> 4°C).
+  4. Quality Gate:
+     - tests/unit/events/event-emitter.spec.ts pasando al 100% en verde.
+     - Regresión total pasando al 100% en verde.
+     - Commit convencional, merge no-ff a develop y mutación inmutable de checkboxes.
+  ```
+- **Output del agente / Respuesta de la herramienta (resumen ejecutivo):**
+  ```text
+  TASK-17 completada con éxito bajo protocolo estricto GitFlow y Loop Engineering:
+  - Instalación compatible de dependencias: @nestjs/event-emitter v2.x alineada con NestJS 10.
+  - EventsModule global implementado en Backend/src/common/events/events.module.ts con EventEmitterModule.forRoot().
+  - Eventos de dominio implementados con nombres canónicos y payloads inmutables:
+    * VentaCompletadaEvent ('venta.completada'): detalles con snapshot de productos, cantidad y subtotales.
+    * VentaAnuladaEvent ('venta.anulada'): motivo, usuario y detalles para reversión de inventario.
+    * RecepcionCreadaEvent ('recepcion.creada'): proveedor, temperaturas de recepción/vehículo y bandera de ruptura de frío.
+  - Publicadores integrados:
+    * VentaService: emite VentaCompletadaEvent en crearVenta() y VentaAnuladaEvent en anularVenta().
+    * InventarioService: emite RecepcionCreadaEvent en registrarRecepcion().
+  - Escuchadores y servicios de soporte implementados:
+    * InventoryEventListener (@OnEvent):
+      - handleVentaCompletada(): activa despacho FEFO automático desacoplado mediante FefoDispatchService (EARS-INV-02, EARS-LOTE-02).
+      - handleVentaAnulada(): incrementa stock en inventario general, registra movimiento de auditoría de tipo 'devolucion' y reabre lotes agotados restaurando su estado (design.md Sec. 8).
+      - handleRecepcionCreada(): evalúa temperaturas y activa alerta ante posible ruptura de cadena de frío (> 4.0°C) (EARS-LOTE-05).
+    * CadenaFrioAlertService: almacena y consulta registros de alertas de cadena de frío por sucursal.
+    * Entidad Lote extendida con métodos de dominio reponer(cantidad) y reabrir() conforme a Rich Domain Model.
+  - Pruebas automatizadas (Quality Gate 100% verde):
+    * tests/unit/events/event-emitter.spec.ts: 6 tests pasando al 100% en verde (despacho FEFO desacoplado, reversión de venta anulada, alerta > 4°C, tolerancia a eventos sin listeners).
+    * Regresión completa de 27 suites y 158 tests pasando al 100% en verde en 29.37s.
+  - GitFlow: commit atómico 17f4f7a en feature/TASK-17-bus-eventos-dominio y merge no-ff 7c1b9f5 a develop.
+  - Mutación inmutable de checkboxes en tasks.md y FASE_TRACKING.md sin eliminación de líneas.
+  ```
+- **Acciones de Git:**
+  - Rama feature: `feature/TASK-17-bus-eventos-dominio` (creada desde `develop`)
+  - Commit atómico feature: `17f4f7a feat(events): implementar bus de eventos en memoria con EventEmitter2 y desacoplamiento DDD (TASK-17)`
+  - Merge a develop: `7c1b9f5 merge: feature/TASK-17-bus-eventos-dominio a develop tras 100% tests en verde`
+- **Reporte de pruebas automatizadas:**
+  | Suite / Nivel | Total | ✅ Pasaron | ❌ Fallaron | Cobertura (%) |
+  |---|---|---|---|---|
+  | Unitarias (event-emitter.spec) | 6 | 6 | 0 | 100% |
+  | **Total Backend Completo (27 Suites)** | **158** | **158** | **0** | **100%** |
+- **Lista detallada de pruebas ejecutadas:**
+  - [x] `event-emitter.spec.ts`: Emisión de VentaCompletadaEvent y ejecución de despacho FEFO desacoplado (EARS-INV-02, EARS-LOTE-02).
+  - [x] `event-emitter.spec.ts`: Emisión de VentaAnuladaEvent, reversión de stock general (+ delta 'devolucion') y reapertura de lote agotado.
+  - [x] `event-emitter.spec.ts`: Emisión de RecepcionCreadaEvent sin alerta cuando temperatura es <= 4°C.
+  - [x] `event-emitter.spec.ts`: Advertencia y registro de alerta de ruptura de cadena de frío cuando temperatura > 4°C (EARS-LOTE-05).
+  - [x] `event-emitter.spec.ts`: Tolerancia del bus ante eventos sin listeners registrados sin bloquear peticiones.
+  - [x] `event-emitter.spec.ts`: Registro, consulta y filtrado por sucursal en CadenaFrioAlertService.
+  - [x] Regresión completa de 27 suites y 158 tests pasando al 100%.
+- **Estado de Funcionalidad / Fase:** ✅ Realizada y Probada (Bloque 8 / TASK-17 completada al 100%, siguiente: TASK-18 Cache-Aside de Catálogo en Redis).
+- **Qué se generó:**
+  - `Backend/src/common/events/events.module.ts`
+  - `Backend/src/common/events/index.ts`
+  - `Backend/src/modules/sales/domain/events/venta-anulada.event.ts`
+  - `Backend/src/modules/inventory/domain/events/recepcion-creada.event.ts`
+  - `Backend/src/modules/inventory/application/services/cadena-frio-alert.service.ts`
+  - `Backend/src/modules/inventory/application/listeners/inventory-event.listener.ts`
+  - `Backend/tests/unit/events/event-emitter.spec.ts`
+
+
 
 

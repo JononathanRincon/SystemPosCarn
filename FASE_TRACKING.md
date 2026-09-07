@@ -167,7 +167,7 @@ Este documento actúa como el **Quality Gate Oficial** del proyecto. Ninguna fas
 
 ### 2.9 Módulo Eventos de Dominio (DDD) y Caché Redis
 - [ ] ⏳ **Desacoplamiento y Rendimiento**
-  - [ ] Bus de eventos `EventEmitter2` implementado
+  - [x] Bus de eventos `EventEmitter2` implementado
   - [ ] Patrón Cache-Aside en Redis para catálogo por sucursal
   - [ ] Invalidación proactiva de caché ante cambios
   - [ ] **Pruebas Unitarias:** `Backend/tests/unit/common/events.spec.ts`
