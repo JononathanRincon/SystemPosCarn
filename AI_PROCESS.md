@@ -1321,6 +1321,108 @@ PLANTILLA ESQUELETO PARA NUEVAS ENTRADAS
   - `Backend/tests/unit/security/rate-limit.spec.ts`
   - `Backend/tests/unit/observability/correlation-logger.spec.ts`
 
+---
+
+## [2026-09-07] — Entrada 22: Bloque 10 — Frontend Web (Next.js 14 App Router Dual, Tailwind CSS y Persistencia Offline IndexedDB con Dexie.js)
+- **Prompt Recibido:**
+  ```text
+  /goal Actúa como Staff Frontend / Fullstack Engineer bajo el protocolo estricto de AGENTS.md, GitFlow y Loop Engineering.
+  1. Kickoff de Bloque: view_file sobre design.md (12.1, 12.2) y PLAN_IMPLEMENTACION.md (Fase 3).
+  2. Aislamiento GitFlow: git checkout -b feature/BLOQUE-10-frontend-nextjs-pwa-indexeddb desde develop.
+  3. Implementación de Micro-Tareas:
+     - TASK-21: Inicialización de Proyecto Next.js 14, Tailwind CSS y App Router Dual (admin/pos).
+     - TASK-22: Persistencia Local Offline con IndexedDB (Dexie.js) con 5 tablas y repos.
+  4. Bucle Interno de Calidad:
+     - Vitest con fake-indexeddb en Frontend/tests/unit/indexeddb.spec.ts.
+     - npm run build generando bundle standalone con 0 errores TS.
+     - Regresión backend (32 suites, 100% verde).
+  5. Cierre y Auditoría: commits convencionales, merge no-ff a develop, mutación inmutable y push origin develop.
+  ```
+- **Output Entregado:**
+  ```text
+  - Inicialización completa de Frontend/ con Next.js 14 (App Router), React 18, TypeScript, Tailwind CSS, lucide-react, clsx, tailwind-merge.
+  - Configuración de tema carnicería en tailwind.config.ts (carmin primario, ambar alertas, neutro grises) y fuentes/botones ergonómicos touch >= 48px y >= 64px.
+  - Configuración de next.config.mjs con output: 'standalone' para despliegue en Vercel y Docker.
+  - PWA manifest en Frontend/public/manifest.json y layout raíz HTML5 con viewport táctil sin zoom accidental.
+  - Arquitectura App Router dual implementada:
+    * app/(admin)/layout.tsx con sidebar colapsable y barra superior.
+    * app/(admin)/dashboard/page.tsx con widgets analíticos KPI placeholder.
+    * app/(pos)/layout.tsx fullscreen táctil oscuro.
+    * app/(pos)/login-pin/page.tsx con teclado numérico táctil de 4 dígitos y auto-submit.
+    * app/(pos)/venta/page.tsx con grid táctil de productos, tabs de categoría, comanda lateral y botón de báscula.
+  - Persistencia offline en Frontend/lib/db/pos-database.ts con Dexie.js v1 y las 5 tablas de design.md 12.2:
+    * productos (id, negocioId, categoriaId, nombre, tipoVenta, precio, unidadMedida, codigoBarras, activo)
+    * categorias (id, nombre, ordenVisualizacion)
+    * lotes (id, productoId, codigoLote, fechaVencimiento, cantidadDisponible)
+    * ventas_outbox (id, status, createdAt, payload) con índice por status
+    * turno_local (id, estado, montoApertura, usuarioId)
+  - Repositorios implementados con Inyección de Dependencias opcional para tests:
+    * catalogo-repo.ts: guardarCatalogoLocal (bulkPut atómico), obtenerProductosLocales (activos, ordenados por nombre), obtenerCategoriasLocales.
+    * venta-outbox-repo.ts: encolarVentaOutbox (UUIDv4 + pending), obtenerVentasPendientesSync (FIFO), marcarVentaSincronizada, marcarVentaConError, contarVentasPorEstado.
+    * turno-repo.ts: abrirTurnoLocal (previene doble turno abierto), obtenerTurnoAbierto, cerrarTurnoLocal.
+  - Suite de pruebas unitarias en Frontend/tests/unit/indexeddb.spec.ts con Vitest + fake-indexeddb: 15 tests pasando al 100%.
+  - Build de producción Next.js 14 validado con standalone output generado exitosamente (0 errores TS).
+  - Regresión del Backend ejecutada: 32 suites y 190 tests pasando al 100%.
+  - GitFlow: commits convencionales 3d4cf1b (TASK-21) y 312d234 (TASK-22) en feature/BLOQUE-10-frontend-nextjs-pwa-indexeddb y merge no-ff 1d89c2e a develop.
+  - Mutación inmutable de checkboxes en tasks.md, FASE_TRACKING.md y PLAN_IMPLEMENTACION.md.
+  ```
+- **Acciones de Git:**
+  - Rama feature: `feature/BLOQUE-10-frontend-nextjs-pwa-indexeddb` (creada desde `develop`)
+  - Commit atómico feature 1: `3d4cf1b feat(frontend): inicializar proyecto Next.js 14 con App Router dual y Tailwind CSS (TASK-21)`
+  - Commit atómico feature 2: `312d234 feat(offline): configurar base de datos local IndexedDB con Dexie.js y outbox (TASK-22)`
+  - Merge a develop: `1d89c2e merge: Bloque 10 Frontend Next.js e IndexedDB a develop tras 100% tests en verde`
+- **Reporte de pruebas automatizadas:**
+  | Suite / Nivel | Total | ✅ Pasaron | ❌ Fallaron | Cobertura (%) |
+  |---|---|---|---|---|
+  | Unitarias IndexedDB (Frontend/tests/unit/indexeddb.spec.ts) | 15 | 15 | 0 | 100% |
+  | Next.js Standalone Build (npm run build) | 7 rutas | 7 | 0 | 100% |
+  | Regresión Total Backend (32 Suites) | 190 | 190 | 0 | 100% |
+- **Lista detallada de pruebas ejecutadas:**
+  - [x] `indexeddb.spec.ts`: Inserción y consulta de productos cárnicos por peso (kg) y unidad (pieza).
+  - [x] `indexeddb.spec.ts`: Filtrado de productos activos por categoría.
+  - [x] `indexeddb.spec.ts`: Consulta general de productos activos sin filtro.
+  - [x] `indexeddb.spec.ts`: Consulta de categorías ordenadas por ordenVisualizacion.
+  - [x] `indexeddb.spec.ts`: Actualización atómica de productos con bulkPut (upsert).
+  - [x] `indexeddb.spec.ts`: Encolado de venta en ventas_outbox con status 'pending' y UUID.
+  - [x] `indexeddb.spec.ts`: Consulta de ventas pendientes en orden cronológico (FIFO).
+  - [x] `indexeddb.spec.ts`: Marcado de venta como sincronizada ('synced') y exclusión de pendientes.
+  - [x] `indexeddb.spec.ts`: Conteo consolidado de ventas por estado (pending, synced, error).
+  - [x] `indexeddb.spec.ts`: Apertura de turno local con montoApertura y cajeroId.
+  - [x] `indexeddb.spec.ts`: Bloqueo de apertura de turno duplicado si ya hay un turno abierto.
+  - [x] `indexeddb.spec.ts`: Consulta reactiva del turno abierto activo.
+  - [x] `indexeddb.spec.ts`: Cierre de turno y autorización para apertura de uno nuevo.
+  - [x] `indexeddb.spec.ts`: Verificación de esquema estricto con las 5 tablas requeridas en design.md 12.2.
+  - [x] `indexeddb.spec.ts`: Inserción y consulta de lotes por productoId para FEFO local.
+  - [x] Next.js build: generación de rutas `/`, `/dashboard`, `/login-pin`, `/venta`, y bundle `.next/standalone`.
+  - [x] Regresión Backend: 32 suites y 190 tests en verde.
+- **Estado de Funcionalidad / Fase:** ✅ Realizada y Probada (Bloque 10 completado al 100%, Base de Frontend Web y Offline-First operativa).
+- **Qué se generó:**
+  - `Frontend/package.json`
+  - `Frontend/tsconfig.json`
+  - `Frontend/tailwind.config.ts`
+  - `Frontend/postcss.config.mjs`
+  - `Frontend/next.config.mjs`
+  - `Frontend/.gitignore`
+  - `Frontend/public/manifest.json`
+  - `Frontend/vitest.config.ts`
+  - `Frontend/tests/setup.ts`
+  - `Frontend/tests/unit/indexeddb.spec.ts`
+  - `Frontend/lib/utils/cn.ts`
+  - `Frontend/lib/db/pos-database.ts`
+  - `Frontend/lib/db/repos/catalogo-repo.ts`
+  - `Frontend/lib/db/repos/venta-outbox-repo.ts`
+  - `Frontend/lib/db/repos/turno-repo.ts`
+  - `Frontend/lib/db/index.ts`
+  - `Frontend/app/globals.css`
+  - `Frontend/app/layout.tsx`
+  - `Frontend/app/page.tsx`
+  - `Frontend/app/(admin)/layout.tsx`
+  - `Frontend/app/(admin)/dashboard/page.tsx`
+  - `Frontend/app/(pos)/layout.tsx`
+  - `Frontend/app/(pos)/login-pin/page.tsx`
+  - `Frontend/app/(pos)/venta/page.tsx`
+
+
 
 
 

@@ -87,7 +87,7 @@ Para asegurar la máxima calidad sin degradar la memoria del agente, cada fase y
 *Skills asociadas:* `.agent/ui-ux-pro-max`, `.agent/design-system`, `.agent/web-design-guidelines`, `.agent/deploy-to-vercel`, `.agent/vercel-optimize`
 
 ### 3.1 Terminal POS Web de Mostrador (PWA Offline)
-- [ ] **3.1.1 Persistencia Offline con IndexedDB:** Almacenamiento local de catálogo y ventas en navegador mediante Dexie/RxDB.
+- [x] **3.1.1 Persistencia Offline con IndexedDB:** Almacenamiento local de catálogo y ventas en navegador mediante Dexie/RxDB.
 - [ ] **3.1.2 Flujo de Venta Ergonómico en 3 Toques:** Selección de corte cárnico, confirmación al carrito y cobro rápido con fuentes $\ge 48\text{px}$.
 - [ ] **3.1.3 Conectividad Directa con Básculas (Web Serial / Web Bluetooth API):** Lectura de peso en vivo sin digitación manual.
 - [ ] **3.1.4 Atajos de Teclado:** Configuración de teclas de función `F1`-`F12`, `Enter` para cobrar y `Esc` para cancelar.

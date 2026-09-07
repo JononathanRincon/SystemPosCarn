@@ -187,7 +187,7 @@ Este documento actúa como el **Quality Gate Oficial** del proyecto. Ninguna fas
 
 - [ ] ⏳ **Módulo POS Web en el navegador (Mostrador PC/Laptop):**
   - [ ] Interfaz táctil y de teclado optimizada para computadoras de mostrador
-  - [ ] Persistencia offline local en navegador mediante IndexedDB / RxDB y Service Workers
+  - [x] Persistencia offline local en navegador mediante IndexedDB / RxDB y Service Workers
   - [ ] Integración de pesaje vía Web Serial / Web Bluetooth API
   - [ ] Impresión directa de tickets de venta
 - [ ] ⏳ **Panel de Administración Web:**

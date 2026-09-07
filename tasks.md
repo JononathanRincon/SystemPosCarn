@@ -155,12 +155,12 @@
 ## Bloque 10: Frontend Web — Estructura Next.js 14, PWA e IndexedDB
 *Skills:* `.agent/deploy-to-vercel`, `.agent/ui-ux-pro-max`, `.agent/design-system`
 
-- [ ] **TASK-21: Inicialización de Proyecto Next.js 14 y Tailwind CSS**
+- [x] **TASK-21: Inicialización de Proyecto Next.js 14 y Tailwind CSS**
   - *Objetivo:* Estructurar App Router en `Frontend/` con soporte para rutas duales `app/(admin)` y `app/(pos)`.
   - *Trazabilidad:* `design.md` Sec. 12.1.
   - *Prueba Verificable:* `npm run build` en `Frontend/` generando bundle standalone.
 
-- [ ] **TASK-22: Configuración de Base de Datos Local IndexedDB con Dexie.js**
+- [x] **TASK-22: Configuración de Base de Datos Local IndexedDB con Dexie.js**
   - *Objetivo:* Crear cliente Dexie.js con tablas `productos`, `categorias`, `lotes`, `ventas_outbox` y `turno_local`.
   - *Trazabilidad:* `design.md` Sec. 12.2.
   - *Prueba Verificable:* Tests de inserción y consulta local en IndexedDB.
