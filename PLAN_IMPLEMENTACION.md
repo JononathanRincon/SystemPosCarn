@@ -61,7 +61,7 @@ Para asegurar la máxima calidad sin degradar la memoria del agente, cada fase y
 
 ### 2.4 Módulo de Inventario por Lote, Mermas y Despacho FEFO
 - [x] **2.4.1 Recepción de Mercancía por Lotes:** Registro de camión/proveedor creando `RecepcionMercancia` y múltiples `Lotes` con fecha de vencimiento y temperatura.
-- [ ] **2.4.2 Algoritmo de Despacho Automático FEFO:** Descuento automático de existencias priorizando el lote con caducidad más cercana en cada venta.
+- [x] **2.4.2 Algoritmo de Despacho Automático FEFO:** Descuento automático de existencias priorizando el lote con caducidad más cercana en cada venta.
 - [ ] **2.4.3 Registro de Mermas Operativas:** Clasificación por desposte, vencimiento, daño o evaporación con vínculo opcional a lote y foto URL.
 - [ ] **2.4.4 Control de Alertas de Stock Crítico y Lotes por Vencer:** Emisión de alertas cuando existencias $\le$ mínimo o caducidad $\le$ 3 días.
 

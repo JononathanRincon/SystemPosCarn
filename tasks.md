@@ -68,7 +68,7 @@
   - *Trazabilidad:* EARS-LOTE-01, US-15.
   - *Prueba Verificable:* `npm run test -- inventario.service.spec.ts`.
 
-- [ ] **TASK-10: Algoritmo de Despacho Automático FEFO en Ventas**
+- [x] **TASK-10: Algoritmo de Despacho Automático FEFO en Ventas**
   - *Objetivo:* Implementar servicio que descuenta automáticamente del lote con `fecha_vencimiento ASC` al registrar una venta, dividiendo entre lotes si es necesario.
   - *Trazabilidad:* EARS-LOTE-02, EARS-LOTE-04, US-18.
   - *Prueba Verificable:* Crear y ejecutar `Backend/tests/integration/lote-fefo.integration.spec.ts`.

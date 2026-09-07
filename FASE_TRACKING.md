@@ -139,14 +139,14 @@ Este documento actúa como el **Quality Gate Oficial** del proyecto. Ninguna fas
 - [ ] ⏳ **Inventario por Lote (FEFO)**
   - [x] Entidad `Lote` implementada con campos completos
   - [x] Entidad `RecepcionMercancia` implementada
-  - [ ] Lógica FEFO (First Expired, First Out) para descuento automático de lotes en ventas
-  - [ ] Distribución multi-lote cuando un lote no cubre la cantidad vendida
-  - [ ] Cambio automático de estado a `agotado` cuando `cantidad_disponible = 0`
-  - [ ] Proceso de vencimiento automático (marcar lotes expirados)
-  - [ ] Endpoints: `/lots`, `/lots/:id/movements`, `/lots/expiring`, `/receptions`
+  - [x] Lógica FEFO (First Expired, First Out) para descuento automático de lotes en ventas
+  - [x] Distribución multi-lote cuando un lote no cubre la cantidad vendida
+  - [x] Cambio automático de estado a `agotado` cuando `cantidad_disponible = 0`
+  - [x] Proceso de vencimiento automático (marcar lotes expirados)
+  - [x] Endpoints: `/lots`, `/lots/:id/movements`, `/lots/expiring`, `/receptions`
   - [ ] **Pruebas Unitarias:** `Backend/tests/unit/inventario/lote.service.spec.ts`
   - [ ] **Pruebas Unitarias:** `Backend/tests/unit/inventario/recepcion.service.spec.ts`
-  - [ ] **Pruebas de Integración:** `Backend/tests/integration/lote-fefo.integration.spec.ts`
+  - [x] **Pruebas de Integración:** `Backend/tests/integration/lote-fefo.integration.spec.ts`
 
 ### 2.8 Módulo Dashboard (API de Reportes)
 - [ ] ⏳ **Dashboard del Dueño y Gerente**
