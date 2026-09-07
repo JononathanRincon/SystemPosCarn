@@ -279,9 +279,45 @@ CREATE TABLE cortes_caja (
     monto_apertura NUMERIC(12,2) NOT NULL,
     total_efectivo_esperado NUMERIC(12,2) DEFAULT 0.00,
     total_efectivo_contado NUMERIC(12,2) DEFAULT 0.00,
+    total_ingresos_extra NUMERIC(12,2) DEFAULT 0.00,
+    total_egresos NUMERIC(12,2) DEFAULT 0.00,
     diferencia NUMERIC(12,2) DEFAULT 0.00,
     totales_por_metodo_pago JSONB DEFAULT '{}'::jsonb,
     observaciones TEXT
+);
+
+-- Movimientos de Caja (Ingresos Extra y Egresos por Compra de Materia Prima / Gastos)
+CREATE TYPE tipo_movimiento_caja AS ENUM ('ingreso', 'egreso');
+
+CREATE TYPE categoria_movimiento_caja AS ENUM (
+    'compra_materia_prima',    -- Pago en efectivo a proveedores de carne/canales/vísceras
+    'flete_transporte',        -- Transporte y acarreo de mercancía cárnica
+    'insumos_empaque',         -- Bolsas, papel vinipel, bandejas, guantes
+    'hielo_refrigeracion',     -- Barras de hielo o recargas de frío
+    'servicios_mantenimiento', -- Afilado de cuchillos, aseo, reparaciones menores
+    'anticipo_nomina',         -- Adelanto de sueldo a carniceros o personal
+    'inyeccion_base',          -- Refuerzo de efectivo/cambio en caja
+    'abono_fiado',             -- Pago en efectivo de cliente con deuda fiada
+    'sangria_seguridad',       -- Retiro de excedente de efectivo hacia caja fuerte
+    'otro'                     -- Gasto o ingreso extraordinario justificado
+);
+
+CREATE TABLE movimientos_caja (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    corte_id UUID NOT NULL REFERENCES cortes_caja(id) ON DELETE CASCADE,
+    sucursal_id UUID NOT NULL REFERENCES sucursales(id) ON DELETE RESTRICT,
+    dispositivo_id UUID REFERENCES dispositivos(id),
+    usuario_id UUID NOT NULL REFERENCES usuarios(id),           -- Cajero que registra
+    autorizado_por_id UUID REFERENCES usuarios(id),             -- Gerente que autoriza
+    tipo tipo_movimiento_caja NOT NULL,
+    categoria categoria_movimiento_caja NOT NULL,
+    monto NUMERIC(12,2) NOT NULL CHECK (monto > 0),
+    beneficiario_proveedor VARCHAR(150),                        -- Proveedor o persona que recibe
+    comprobante VARCHAR(100),                                   -- No. de factura, remisión o recibo
+    descripcion TEXT NOT NULL,                                  -- Detalle descriptivo del movimiento
+    fecha_hora_dispositivo TIMESTAMPTZ NOT NULL,
+    fecha_hora_servidor TIMESTAMPTZ DEFAULT NOW(),
+    sincronizado BOOLEAN DEFAULT TRUE
 );
 
 CREATE TABLE dispositivos (
@@ -464,10 +500,13 @@ Todos los endpoints exigen la cabecera `Authorization: Bearer <JWT>` salvo `/aut
 17. `GET /lots/expiring`: Query `?sucursalId=<uuid>&days=3` $\rightarrow$ Lotes con `fechaVencimiento <= NOW() + interval '3 days'`.
 18. `POST /receptions`: `{ sucursalId, usuarioId, proveedor, fechaRecepcion, observaciones, lotes: [ { productoId, codigoLote, cantidadRecibida, costoUnitario, fechaVencimiento, temperaturaRecepcion, notas } ] }` $\rightarrow$ Crea `RecepcionMercancia` + N `Lotes` + N `MovimientosInventario` (tipo `'recepcion'`).
 
-### 7.5 Turnos de Caja
+### 7.5 Turnos y Movimientos de Caja (Flujo de Efectivo Completo)
 19. `POST /cash-shifts/open`: `{ sucursalId, dispositivoId, usuarioId, montoApertura }` $\rightarrow$ `{ id, estado: 'abierta', fechaApertura, montoApertura }`.
-20. `GET /cash-shifts/current`: Query `?dispositivoId=<uuid>` $\rightarrow$ `{ corteId, estado, montoApertura, ventasAcumuladas, efectivoEsperado }`.
+20. `GET /cash-shifts/current`: Query `?dispositivoId=<uuid>` $\rightarrow$ `{ corteId, estado, montoApertura, ventasAcumuladas, totalIngresosExtra, totalEgresos, efectivoEsperado }`. Donde `efectivoEsperado = montoApertura + ventasAcumuladas + totalIngresosExtra - totalEgresos`.
 21. `POST /cash-cuts`: `{ corteId, totalEfectivoContado, totalesPorMetodoPago, observaciones }` $\rightarrow$ Calcula `diferencia = contado - esperado`, sella `estado = 'cerrada'` e inmutable.
+25. `POST /cash-shifts/movements`: `{ corteId, dispositivoId, usuarioId, autorizadoPorId, tipo ('ingreso'|'egreso'), categoria, monto, beneficiarioProveedor, comprobante, descripcion }` $\rightarrow$ Valida que la caja esté abierta y que el egreso no exceda el efectivo disponible en caja (`monto <= saldoDisponible`). Registra el movimiento y actualiza los acumuladores en `cortes_caja`.
+26. `GET /cash-shifts/current/movements`: Query `?dispositivoId=<uuid>` $\rightarrow$ Lista cronológica de ingresos y egresos registrados durante el turno en curso con subtotales por categoría.
+27. `GET /cash-shifts/:id/movements`: $\rightarrow$ Consulta histórica de movimientos de caja de un turno cerrado para auditoría gerencial.
 
 ### 7.6 Analítica y Dashboards
 22. `GET /reports/sales`: Query `?sucursalId=<uuid>&fechaInicio=<ISO>&fechaFin=<ISO>&agruparPor=categoria|producto|metodo` $\rightarrow$ Totales agregados, volumen en kg/unidades y margen bruto.

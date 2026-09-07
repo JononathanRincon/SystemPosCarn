@@ -60,8 +60,8 @@ Este documento actúa como el **Quality Gate Oficial** del proyecto. Ninguna fas
   - [x] Flujo de recepción de mercancía documentado (sec. 7.6.3)
   - [x] 12 directrices UX obligatorias (sec. 7.6.4)
 - [x] ✅ **1.8 Corrección de Brechas Técnicas del SDD**
-  - [x] API expandida de 7 a 24 endpoints (sec. 7)
-  - [x] EARS-CAJA-04 y EARS-CAJA-05 agregados (sec. 9.5)
+  - [x] API expandida de 7 a 27 endpoints (sec. 7)
+  - [x] EARS-CAJA-04 a EARS-CAJA-07 agregados (sec. 9.5)
   - [x] EARS-DASH-01 a 03 para reportes (sec. 9.7)
   - [x] Nota sobre seguridad de descarga de PIN (sec. 7)
   - [x] Nota sobre tratamiento fiscal futuro (sec. 14)
@@ -134,6 +134,15 @@ Este documento actúa como el **Quality Gate Oficial** del proyecto. Ninguna fas
   - [x] Cuadre de caja por método de pago (`contado - esperado`)
   - [x] **Pruebas de Corte de Caja:** `Backend/tests/unit/corte-caja/corte-caja.service.spec.ts`
   - [x] **Prueba de Integración de Flujo de Caja:** `Backend/tests/integration/corte-caja.integration.spec.ts`
+- [ ] ⏳ **Gestión de Ingresos y Egresos de Caja (Gastos y Materia Prima)**
+  - [ ] Entidad `MovimientoCaja` con tipos (`ingreso`, `egreso`) y 10 categorías operativas
+  - [ ] Registro de compras de materia prima/ganado/insumos pagados desde caja física
+  - [ ] Inyecciones de efectivo (refuerzo de base) y abonos de clientes a cuentas por cobrar
+  - [ ] Deducción automática de egresos y suma de ingresos en el cálculo de `monto_esperado` de efectivo
+  - [ ] Validación de saldo suficiente en efectivo antes de autorizar egreso de caja
+  - [ ] Endpoints: `POST /cash-shifts/movements`, `GET /cash-shifts/current/movements`, `GET /cash-shifts/:id/movements`
+  - [ ] **Pruebas de Movimientos de Caja:** `Backend/tests/unit/corte-caja/movimiento-caja.service.spec.ts`
+  - [ ] **Prueba de Integración de Egresos en Corte:** `Backend/tests/integration/movimientos-caja.integration.spec.ts`
 
 ### 2.7 Módulo Lotes & Recepciones de Mercancía
 - [x] ✅ **Inventario por Lote (FEFO)**

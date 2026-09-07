@@ -330,11 +330,32 @@ WatermelonDB (si se usa React Native) o RxDB, ambas diseñadas específicamente 
 | estado | enum(abierta, cerrada) | Estado actual del turno de caja (requerido por EARS-CAJA-03 y EARS-CAJA-04 para controlar acceso a ventas) |
 | fecha_apertura, fecha_cierre | timestamp | |
 | monto_apertura | decimal(12,2) | Base de caja inicial |
-| total_efectivo_esperado | decimal(12,2) | Calculado por el sistema |
-| total_efectivo_contado | decimal(12,2) | Ingresado manualmente por el cajero |
-| diferencia | decimal(12,2) | `contado - esperado` |
-| totales_por_metodo_pago | JSON | `{"efectivo": 450000, "tarjeta": 210000, ...}` |
+| total_efectivo_esperado | decimal(12,2) | Calculado por el sistema: `monto_apertura + ventas_efectivo + total_ingresos_extra - total_egresos` |
+| total_efectivo_contado | decimal(12,2) | Ingresado manualmente por el cajero (arqueo ciego) |
+| total_ingresos_extra | decimal(12,2) | Sumatoria de inyecciones de cambio o abonos recibidos en el turno |
+| total_egresos | decimal(12,2) | Sumatoria de pagos a proveedores de materia prima, fletes, insumos o gastos menores sacados de caja |
+| diferencia | decimal(12,2) | `contado - esperado` (inmutable tras sellar el corte) |
+| totales_por_metodo_pago | JSON | `{"efectivo": 450000, "tarjeta": 210000, "transferencia": 120000, "fiado": 50000}` |
 | observaciones | text (nullable) | |
+
+**MovimientoCaja** — *Trazabilidad de Ingresos Extra y Egresos (Materia Prima y Gastos Operativos de Caja)*
+| Campo | Tipo | Notas |
+|---|---|---|
+| id | UUID (PK) | Generado en dispositivo o servidor |
+| corte_id | UUID (FK → CorteDeCaja) | Vinculado al turno de caja activo en el momento del movimiento |
+| sucursal_id | UUID (FK → Sucursal) | Sucursal donde ocurre el movimiento |
+| dispositivo_id | UUID (FK, nullable) | Caja física de donde se retira o ingresa el efectivo |
+| usuario_id | UUID (FK → Usuario) | Cajero u operador que registra la transacción |
+| autorizado_por_id | UUID (FK → Usuario, nullable) | Gerente o supervisor que autoriza el egreso (obligatorio en montos altos) |
+| tipo | enum(ingreso, egreso) | Sentido del flujo de dinero físico |
+| categoria | enum(compra_materia_prima, flete_transporte, insumos_empaque, hielo_refrigeracion, servicios_mantenimiento, anticipo_nomina, inyeccion_base, abono_fiado, sangria_seguridad, otro) | Clasificación contable/operativa del egreso o ingreso |
+| monto | decimal(12,2) | Monto monetario exacto retirado o ingresado (debe ser > 0) |
+| beneficiario_proveedor | string (nullable) | Nombre del proveedor (ej. "Frigorífico San Martín", "Transportes Cárnicos") o persona que recibe |
+| comprobante | string (nullable) | Número de factura física, remisión, recibo de caja o vale |
+| descripcion | text | Detalle explicativo obligatorio del motivo del gasto/ingreso |
+| fecha_hora_dispositivo | timestamp | Momento en que se registró en la terminal |
+| fecha_hora_servidor | timestamp | Momento de sincronización o persistencia central |
+| sincronizado | boolean | Indicador de sincronización offline-first |
 
 **Lote** — *Trazabilidad de inventario a nivel de lote/batch*
 | Campo | Tipo | Notas |
@@ -413,6 +434,7 @@ Negocio 1───N Categoria ───N Producto
 Sucursal 1───N Dispositivo
 Sucursal 1───N Inventario ──1 Producto
 Sucursal 1───N CorteDeCaja
+CorteDeCaja 1───N MovimientoCaja
 Dispositivo 1───N Venta ───N DetalleVenta ──1 Producto
 Venta 1───N PagoVenta
 Producto 1───N MovimientoInventario
@@ -449,6 +471,7 @@ erDiagram
   PRODUCTO ||--o{ MOVIMIENTOINVENTARIO : afecta
   PRODUCTO ||--o{ MERMA : pierde
   SUCURSAL ||--o{ CORTECAJA : cierra
+  CORTECAJA ||--o{ MOVIMIENTOCAJA : registra
   RECEPCIONMERCANCIA ||--o{ LOTE : crea
   LOTE ||--o{ MOVIMIENTOINVENTARIO : origina
   LOTE ||--o{ MERMA : afecta
@@ -550,9 +573,19 @@ erDiagram
     decimal cantidad
     enum motivo
   }
+  MOVIMIENTOCAJA {
+    uuid id PK
+    uuid corte_id FK
+    uuid usuario_id FK
+    enum tipo
+    enum categoria
+    decimal monto
+    string beneficiario_proveedor
+    string comprobante
+  }
 ```
 
-`Producto` es el centro de gravedad del modelo: conecta con `Inventario`, `DetalleVenta`, `MovimientoInventario` y `Lote`. `Dispositivo` (la tablet/caja) es dueño de la `Venta`, no la `Sucursal` directamente, para poder rastrear siempre desde qué caja física salió cada transacción. `MovimientoInventario` cuelga de `Producto` y opcionalmente de `Lote` porque también se genera por mermas, recepciones o ajustes manuales, no solo por ventas. `Lote` permite trazabilidad FEFO y cálculo de margen real por compra.
+`Producto` es el centro de gravedad del modelo: conecta con `Inventario`, `DetalleVenta`, `MovimientoInventario` y `Lote`. `Dispositivo` (la tablet/caja) es dueño de la `Venta`, no la `Sucursal` directamente, para poder rastrear siempre desde qué caja física salió cada transacción. `MovimientoInventario` cuelga de `Producto` y opcionalmente de `Lote` porque también se genera por mermas, recepciones o ajustes manuales, no solo por ventas. `Lote` permite trazabilidad FEFO y cálculo de margen real por compra. `MovimientoCaja` permite la trazabilidad completa del dinero físico en efectivo de la gaveta (egresos por pago de carne a proveedores, fletes, gastos menores e ingresos extra).
 
 ### 6.7 Qué vive offline vs. qué se descarga
 
@@ -560,7 +593,7 @@ erDiagram
 |---|---|
 | Negocio, Sucursal, Usuario, Rol | Venta, DetalleVenta, PagoVenta |
 | Categoria, Producto | MovimientoInventario, Merma |
-| Inventario (snapshot inicial) | CorteDeCaja |
+| Inventario (snapshot inicial) | CorteDeCaja, MovimientoCaja |
 | Lotes existentes (snapshot para consulta y FEFO) | Lote (nuevos, creados en recepción offline) |
 | | RecepcionMercancia |
 
@@ -585,8 +618,11 @@ erDiagram
 | `/devices/register` | POST | Registro y autorización de nuevo dispositivo POS con generación de `token_dispositivo`. |
 | `/devices/:id/heartbeat` | POST | Heartbeat de dispositivo activo, actualiza `ultima_sincronizacion`. |
 | `/cash-shifts/open` | POST | Apertura de turno de caja con monto base inicial obligatorio. |
-| `/cash-shifts/current` | GET | Estado actual del turno de caja activo en el dispositivo solicitante. |
-| `/cash-cuts` | POST | Registro de corte de caja con monto contado y cálculo de diferencia. |
+| `/cash-shifts/current` | GET | Estado actual del turno de caja activo en el dispositivo solicitante (base, ventas, ingresos, egresos, efectivo esperado). |
+| `/cash-cuts` | POST | Registro de corte de caja con monto contado y cálculo de diferencia inmutable. |
+| `/cash-shifts/movements` | POST | Registro de ingresos extra (inyección base) y egresos de caja (pago materia prima/proveedores, fletes, insumos, gastos). |
+| `/cash-shifts/current/movements` | GET | Listado detallado de movimientos de ingresos y egresos del turno de caja en curso. |
+| `/cash-shifts/:id/movements` | GET | Auditoría histórica de ingresos y egresos de un turno de caja específico. |
 | `/lots` | GET/POST | Gestión de lotes de inventario por sucursal (listado filtrable por estado/producto). |
 | `/lots/:id/movements` | GET | Historial de movimientos de inventario asociados a un lote específico. |
 | `/lots/expiring` | GET | Lotes con `fecha_vencimiento` dentro de los próximos N días (parámetro `days`, default 3). |
@@ -736,6 +772,7 @@ Estructuradas bajo el formato clásico: **Como [rol], quiero [acción] para [ben
 - **US-04:** *Como cajero*, quiero registrar pagos mixtos (combinar efectivo y tarjeta o transferencia), para brindar flexibilidad al cliente y cuadrar con precisión el dinero recibido.
 - **US-05:** *Como cajero*, quiero que el sistema me permita seguir vendiendo sin interrupción aunque se caiga el internet, para no paralizar la atención ni perder ventas.
 - **US-06:** *Como cajero*, quiero realizar el corte y cierre de caja al finalizar mi jornada, para comparar el dinero físico contado contra el valor esperado por el sistema.
+- **US-19:** *Como cajero o gerente*, quiero registrar egresos de dinero en efectivo de la gaveta de caja (pagos de materia prima cárnica a proveedores, fletes, hielo o insumos), asociando el monto, motivo y comprobante, para que el cuadre de caja refleje con exactitud el dinero físico restante sin generar falsos faltantes.
 
 ### 8.2 Gerente de Sucursal
 - **US-07:** *Como gerente de sucursal*, quiero registrar mermas operativas clasificadas por motivo (corte/desposte, vencimiento, daño, evaporación), para reflejar el inventario real y controlar el desperdicio.
@@ -805,12 +842,14 @@ graph TD
 - **EARS-SYNC-04 (Unwanted behavior):** Si el servidor recibe una venta cuyo UUID ya fue registrado previamente, el sistema responderá con estado exitoso (HTTP 200) reconociendo la transacción pero omitirá su re-inserción en base de datos para garantizar idempotencia estricta.
 - **EARS-SYNC-05 (Optional):** Donde dos terminales offline de la misma sucursal vendan el mismo producto provocando que el stock consolidado quede inferior a cero, el sistema registrará una alerta de "Stock Negativo Post-Sincronización" en el panel administrativo sin anular ni revertir las ventas ya efectuadas.
 
-### 9.5 Corte y Cuadre de Caja
+### 9.5 Corte, Flujo y Movimientos de Caja
 - **EARS-CAJA-01 (Ubicuo):** El sistema mantendrá el desglose acumulado de ventas por cada método de pago de forma independiente para cada dispositivo/caja activa.
-- **EARS-CAJA-02 (Event-driven):** Cuando el cajero envíe el monto de efectivo físico contado en el cierre de turno, el sistema calculará la diferencia aritmética `diferencia = total_efectivo_contado - total_efectivo_esperado` y registrará el corte como inmutable.
+- **EARS-CAJA-02 (Event-driven):** Cuando el cajero envíe el monto de efectivo físico contado en el cierre de turno, el sistema calculará la diferencia aritmética `diferencia = total_efectivo_contado - total_efectivo_esperado`, donde `total_efectivo_esperado = monto_apertura + ventas_efectivo + total_ingresos_extra - total_egresos`, y registrará el corte como inmutable.
 - **EARS-CAJA-03 (Unwanted behavior):** Si un cajero intenta registrar una venta sin haber realizado previamente la apertura de turno con base inicial, el sistema bloqueará la pantalla de venta e invitará al formulario de apertura de caja.
 - **EARS-CAJA-04 (State-driven):** Mientras una caja se encuentre en estado `cerrada` y no se haya registrado una nueva apertura de turno, el sistema bloqueará la creación de ventas en ese dispositivo y mostrará el formulario de apertura de caja con el campo obligatorio de monto base.
-- **EARS-CAJA-05 (Optional):** Donde el gerente autorice un ingreso adicional de efectivo a una caja abierta (ej. cambio de billetes grandes), el sistema registrará el movimiento como ajuste de base sin afectar los totales de venta del turno.
+- **EARS-CAJA-05 (Event-driven):** Cuando el gerente autorice un ingreso o inyección adicional de efectivo a una caja abierta (ej. refuerzo de cambio o abono en efectivo de fiado), el sistema registrará el movimiento como `ingreso` en `MovimientoCaja` sumando al efectivo esperado sin alterar los totales de venta del turno.
+- **EARS-CAJA-06 (Event-driven):** Cuando se realice un pago en efectivo a proveedores de materia prima cárnica (canales de res, cerdos, pollo) o gasto operativo menor (fletes, insumos de empaque, hielo, servicios), el sistema registrará un movimiento de `egreso` en `MovimientoCaja` restando del efectivo esperado, exigiendo categoría, beneficiario, descripción obligatoria y número de comprobante/remisión.
+- **EARS-CAJA-07 (Unwanted behavior):** Si se intenta registrar un egreso de efectivo cuyo monto supere el saldo disponible en caja en ese instante (`base + ventas_efectivo + ingresos - egresos_previos`), el sistema rechazará la operación por saldo insuficiente e impedirá el descuadre de la gaveta.
 
 ### 9.6 Inventario por Lote y Recepción de Mercancía
 

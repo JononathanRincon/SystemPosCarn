@@ -1,4 +1,4 @@
-﻿# Requirements Document — Sistema POS Multi-Sucursal para Carnicerías
+# Requirements Document — Sistema POS Multi-Sucursal para Carnicerías
 **Especificación Conceptual y Requerimientos Funcionales (EARS)**
 
 > **Propósito:** Este documento define exclusivamente las reglas de negocio, historias de usuario y comportamiento funcional esperado sin atarse a código ni tecnologías de implementación. Es la fuente de verdad conceptual para el agente de desarrollo.
@@ -23,6 +23,7 @@ El sistema resuelve tres problemáticas críticas de carnicerías y frigorífico
 - **US-04:** *Como cajero*, quiero registrar pagos mixtos (efectivo, tarjeta, transferencia), para dar flexibilidad al cliente y cuadrar el dinero.
 - **US-05:** *Como cajero*, quiero seguir vendiendo de forma transparente aunque no haya internet, sin perder transacciones ni congelar la terminal.
 - **US-06:** *Como cajero*, quiero realizar el corte de caja al finalizar jornada, comparando el dinero físico contra el esperado por el sistema.
+- **US-19:** *Como cajero o gerente*, quiero registrar egresos de dinero en efectivo de la gaveta de caja (pagos de materia prima cárnica a proveedores, fletes, hielo o insumos), asociando el monto, motivo y comprobante, para que el cuadre de caja refleje con exactitud el dinero físico restante sin generar falsos faltantes.
 
 ### 2.2 Gerente de Sucursal
 - **US-07:** *Como gerente*, quiero registrar mermas operativas clasificadas por motivo (corte, vencimiento, daño), para mantener el stock real.
@@ -77,12 +78,14 @@ El sistema resuelve tres problemáticas críticas de carnicerías y frigorífico
 - **EARS-SYNC-04 (Unwanted behavior):** Si el servidor recibe una venta cuyo UUID ya fue registrado previamente, responderá con HTTP 200 reconociendo la operación pero omitirá la re-inserción (idempotencia estricta).
 - **EARS-SYNC-05 (Optional):** Donde dos terminales offline vendan el mismo producto provocando stock consolidado negativo, el sistema emitirá alerta en el panel admin sin anular las ventas ya efectuadas.
 
-### 3.5 Corte y Cuadre de Caja
+#### 3.5 Corte, Flujo y Movimientos de Caja
 - **EARS-CAJA-01 (Ubicuo):** El sistema mantendrá el desglose acumulado de ventas por método de pago de forma independiente para cada caja activa.
-- **EARS-CAJA-02 (Event-driven):** Cuando el cajero envíe el monto de efectivo contado al cerrar turno, el sistema calculará la diferencia aritmética inmutable (`contado - esperado`).
+- **EARS-CAJA-02 (Event-driven):** Cuando el cajero envíe el monto de efectivo contado al cerrar turno, el sistema calculará la diferencia aritmética inmutable (`contado - esperado`), donde `esperado = monto_apertura + ventas_efectivo + ingresos_extra - egresos_totales`.
 - **EARS-CAJA-03 (Unwanted behavior):** Si un cajero intenta registrar una venta sin haber realizado previamente la apertura de turno con base inicial, el sistema bloqueará la pantalla de venta.
 - **EARS-CAJA-04 (State-driven):** Mientras una caja se encuentre en estado `cerrada`, el sistema impedirá transacciones de venta en ese dispositivo.
-- **EARS-CAJA-05 (Optional):** Donde el gerente autorice ingreso adicional de efectivo a una caja abierta, el sistema registrará ajuste de base sin alterar totales de venta.
+- **EARS-CAJA-05 (Event-driven):** Cuando se autorice una inyección o refuerzo de cambio a una caja abierta, el sistema registrará un movimiento de `ingreso` sumando al efectivo esperado sin alterar las cifras de ventas.
+- **EARS-CAJA-06 (Event-driven):** Cuando se realice un pago en efectivo a proveedores de materia prima cárnica o gasto operativo menor (fletes, insumos, hielo, servicios), el sistema registrará un movimiento de `egreso` restando del efectivo esperado, exigiendo categoría, beneficiario, descripción obligatoria y número de comprobante/remisión.
+- **EARS-CAJA-07 (Unwanted behavior):** Si se intenta registrar un egreso de efectivo cuyo monto supere el saldo disponible en caja en ese instante (`base + ventas_efectivo + ingresos - egresos_previos`), el sistema rechazará la operación por saldo insuficiente.
 
 ### 3.6 Dashboard y Reportes
 - **EARS-DASH-01 (Ubicuo):** El sistema calculará los indicadores financieros del dashboard utilizando exclusivamente datos sincronizados en el servidor, mostrando la marca de tiempo de la última sync.
@@ -99,3 +102,5 @@ El sistema resuelve tres problemáticas críticas de carnicerías y frigorífico
 4. **Lote vencido con saldo:** Cambio automático a `vencido`, exclusión de FEFO y alerta para merma.
 5. **Recepción simultánea offline:** Cada dispositivo genera lote con UUID único; al sincronizar coexisten sin colisión.
 6. **Apagón repentino durante cobro:** Transacción atómica local; si se corta antes del commit, el carrito se rescata como borrador al reabrir.
+7. **Egreso de efectivo superior al disponible en gaveta:** Se bloquea el registro del egreso si el cajero intenta registrar un retiro mayor al dinero real recaudado hasta el momento.
+
