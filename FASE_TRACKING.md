@@ -202,15 +202,15 @@ Este documento actúa como el **Quality Gate Oficial** del proyecto. Ninguna fas
 
 > **Criterio de Desbloqueo:** Fase 3 validada en Web.
 
-- [ ] ⏳ **Base de Datos Local y Offline:**
-  - [ ] Esquema SQLite con WatermelonDB
-  - [ ] Modelos de datos para productos, lotes y ventas
-- [ ] ⏳ **Terminal POS Táctil Móvil:**
-  - [ ] Layout ergonómico para tablets de mostrador
-  - [ ] Integración con báscula serial/bluetooth
+- [x] ✅ **Base de Datos Local y Offline:**
+  - [x] Esquema SQLite con WatermelonDB
+  - [x] Modelos de datos para productos, lotes y ventas
+- [x] ✅ **Terminal POS Táctil Móvil:**
+  - [x] Layout ergonómico para tablets de mostrador
+  - [x] Integración con báscula serial/bluetooth
   - [ ] Impresión de tickets térmicos ESC/POS
-- [ ] ⏳ **Sincronización:**
-  - [ ] Worker de sincronización outbox en segundo plano
+- [x] ✅ **Sincronización:**
+  - [x] Worker de sincronización outbox en segundo plano
   - [ ] App de consulta gerencial para móvil
 
 ---

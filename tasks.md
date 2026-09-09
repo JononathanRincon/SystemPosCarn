@@ -205,17 +205,17 @@
 ## Bloque 13: Mobile & Tablet POS (React Native)
 *Skills:* `.agent/vercel-react-native-skills`, `.agent/ui-ux-pro-max`
 
-- [ ] **TASK-28: Configuración Base React Native y WatermelonDB**
+- [x] **TASK-28: Configuración Base React Native y WatermelonDB**
   - *Objetivo:* Configurar esquema SQLite local y modelos WatermelonDB en `mobile/`.
   - *Trazabilidad:* `design.md` Sec. 13.
   - *Prueba Verificable:* Compilación y test unitario de esquema WatermelonDB.
 
-- [ ] **TASK-29: Pantalla de Venta Táctil Horizontal para Tablets**
+- [x] **TASK-29: Pantalla de Venta Táctil Horizontal para Tablets**
   - *Objetivo:* Layout optimizado para cajero de pie con botones $\ge 64\text{px}$ y alto contraste.
   - *Trazabilidad:* NFR-Ergonomía, US-01, US-03.
   - *Prueba Verificable:* Snapshot test de interfaz tablet en React Native.
 
-- [ ] **TASK-30: Sincronización en Segundo Plano y Driver Serial Nativo**
+- [x] **TASK-30: Sincronización en Segundo Plano y Driver Serial Nativo**
   - *Objetivo:* Integración de `react-native-serialport` para básculas y sincronizador bidireccional outbox.
   - *Trazabilidad:* EARS-SYNC-02, EARS-SYNC-03, US-05.
   - *Prueba Verificable:* Simulación de cola outbox y conexión serial.
