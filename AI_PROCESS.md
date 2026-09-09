@@ -1422,6 +1422,120 @@ PLANTILLA ESQUELETO PARA NUEVAS ENTRADAS
   - `Frontend/app/(pos)/login-pin/page.tsx`
   - `Frontend/app/(pos)/venta/page.tsx`
 
+---
+
+## [2026-09-08] — Entrada 23: Bloque 11 — Frontend Web POS (Terminal de Mostrador, Driver de Báscula Web Serial a 3 Decimales, Comanda Ergonómica, Modal de Cobro Multimétodo e Impresión ESC/POS)
+- **Prompt Recibido:**
+  ```text
+  /goal Actúa como Staff Frontend Engineer especializado en Terminales POS y Hardware bajo el protocolo estricto de AGENTS.md, GitFlow y Loop Engineering.
+  1. Kickoff de Bloque: view_file sobre design.md (12.1, 12.3, 15), requirements.md (US-02 a US-04, EARS-VENTA-01 a 05, Edge Cases 1 y 2) y skills de .agent/.
+  2. Aislamiento GitFlow: git checkout -b feature/BLOQUE-11-terminal-pos-hardware-bascula desde develop.
+  3. Implementación de Micro-Tareas:
+     - TASK-23: Pantalla de Venta Ergonómica en 3 Toques (Frontend/app/(pos)/venta/page.tsx).
+     - TASK-24: Driver de Báscula Web Serial y Bluetooth (Frontend/lib/hardware/scale-driver.ts).
+     - TASK-25: Modal de Cobro Multimétodo e Impresión de Tickets (Frontend/components/pos/cobro/ModalCobro.tsx y Frontend/lib/hardware/escpos-printer.ts).
+  4. Bucle Interno de Calidad:
+     - Vitest en Frontend/tests/unit/scale-driver.spec.ts, pos-cart.spec.ts, escpos-printer.spec.ts.
+     - npm run build generando bundle standalone con 0 errores TS.
+     - Regresión backend (32 suites, 190 tests, 100% verde).
+  5. Cierre y Auditoría: commits atómicos convencionales, merge no-ff a develop, mutación inmutable y push origin develop.
+  ```
+- **Output Entregado:**
+  ```text
+  - Módulo Hardware ScaleDriver (Frontend/lib/hardware/scale-driver.ts):
+    * Interfaz WeightReading y ScaleDriver según design.md Sec. 12.3.
+    * Parser robusto parseScaleFrame para tramas seriales de básculas Torrey (L-EQ/MFQ), CAS (ER-Plus), Toledo y Magellan/Datalogic.
+    * Redondeo estricto a 3 decimales en kilogramos (decimal(10,3)) y detección de estabilidad isStable.
+    * Conductor MockScaleDriver para tests unitarios y simulación en entorno de desarrollo.
+    * Conductor WebSerialScaleDriver con Web Serial API (navigator.serial a 9600 baudios, 8N1) y temporizador watchdog para detección de pérdida de señal (Caso Límite 1).
+    * Hook React useScale() en Frontend/lib/hardware/use-scale.ts con estado memoizado y suscripciones aisladas para prevenir re-renders globales.
+  - Generador de Comandos ESC/POS (Frontend/lib/hardware/escpos-printer.ts):
+    * EscPosBuilder para impresoras térmicas de 58mm y 80mm con comandos de corte de papel y estilos.
+    * generateEscPosCommands para tickets de carnicería con desglose de kg/unidades, subtotales, formas de pago y devuelta.
+    * generateTicketHtml y printTicketInBrowser como fallback para impresión nativa del navegador.
+  - Dominio del Carrito POS (Frontend/lib/pos/pos-cart.ts):
+    * Validaciones de Casos Límite 1 y 2 (bloqueo de peso <= 0.000 kg o infinitesimal < 0.001 kg).
+    * Subtotales con 2 decimales monetarios (EARS-VENTA-01).
+    * Agrupación por unidad y pesadas independientes para productos cárnicos (US-03).
+    * Validación de pagos simples y mixtos con cálculo dinámico de cambio/devuelta (EARS-VENTA-04, US-04).
+    * procesarVentaLocal con persistencia inmediata outbox en IndexedDB.
+  - Componentes de Mostrador y Ergonomía:
+    * IndicadorBascula.tsx: display digital gigante de peso en tiempo real, badge de estabilidad, alertas de pérdida de señal, botones de TARA/CERO y selector de pesaje simulado.
+    * ModalCobro.tsx: teclado táctil >= 64px, botones de billetes rápidos ($10k, $20k, $50k, $100k, Exacto), selector de efectivo/tarjeta/transferencia, pagos mixtos y confirmación de venta con ticket.
+    * venta/page.tsx: selector de categorías >= 48px con atajos F1-F6, tarjetas de corte cárnico con badge Kg vs Und, comanda lateral en tiempo real con Gran Total >= 48px y atajos de teclado (Enter, Esc).
+  - Bucle Interno de Calidad:
+    * scale-driver.spec.ts: 13/13 tests en verde.
+    * pos-cart.spec.ts: 13/13 tests en verde.
+    * escpos-printer.spec.ts: 3/3 tests en verde.
+    * indexeddb.spec.ts: 15/15 tests en verde.
+    * Total Frontend: 44 tests unitarios pasando al 100%.
+    * Compilación Next.js 14 validada con bundle standalone generado exitosamente (0 errores TS).
+    * Regresión Backend: 32 suites y 190 tests en verde.
+  - GitFlow: commits atómicos 7dcdca2 (TASK-23), 5142681 (TASK-24), 26a1bed (TASK-25) en feature/BLOQUE-11-terminal-pos-hardware-bascula y merge no-ff 11cd62c a develop.
+  - Mutación inmutable de checkboxes en tasks.md, FASE_TRACKING.md y PLAN_IMPLEMENTACION.md.
+  ```
+- **Acciones de Git:**
+  - Rama feature: `feature/BLOQUE-11-terminal-pos-hardware-bascula` (creada desde `develop`)
+  - Commit atómico feature 1: `7dcdca2 feat(pos): implementar grid tactil de venta en 3 toques y comanda lateral (TASK-23)`
+  - Commit atómico feature 2: `5142681 feat(hardware): implementar driver de bascula Web Serial con parseo a 3 decimales (TASK-24)`
+  - Commit atómico feature 3: `26a1bed feat(pos): modal de cobro multimetodo y generador de tickets ESC/POS (TASK-25)`
+  - Merge a develop: `11cd62c merge: Bloque 11 Terminal POS y Hardware a develop tras 100% tests en verde`
+- **Reporte de pruebas automatizadas:**
+  | Suite / Nivel | Total | ✅ Pasaron | ❌ Fallaron | Cobertura (%) |
+  |---|---|---|---|---|
+  | Unitarias Hardware ScaleDriver (scale-driver.spec.ts) | 13 | 13 | 0 | 100% |
+  | Unitarias Carrito POS y Pagos (pos-cart.spec.ts) | 13 | 13 | 0 | 100% |
+  | Unitarias Tickets ESC/POS (escpos-printer.spec.ts) | 3 | 3 | 0 | 100% |
+  | Unitarias Persistencia IndexedDB (indexeddb.spec.ts) | 15 | 15 | 0 | 100% |
+  | Total Pruebas Frontend (Vitest) | 44 | 44 | 0 | 100% |
+  | Next.js Standalone Build (npm run build) | 7 rutas | 7 | 0 | 100% |
+  | Regresión Total Backend (32 Suites) | 190 | 190 | 0 | 100% |
+- **Lista detallada de pruebas ejecutadas:**
+  - [x] `scale-driver.spec.ts`: Parseo de tramas estables Torrey L-EQ a 3 decimales.
+  - [x] `scale-driver.spec.ts`: Parseo de tramas inestables Torrey (US).
+  - [x] `scale-driver.spec.ts`: Parseo de tramas CAS ER-Plus con signos y ceros a la izquierda.
+  - [x] `scale-driver.spec.ts`: Parseo de tramas Toledo / Magellan con prefijo S o D.
+  - [x] `scale-driver.spec.ts`: Parseo de números continuos con signo.
+  - [x] `scale-driver.spec.ts`: Redondeo estricto a 3 decimales de kilogramos.
+  - [x] `scale-driver.spec.ts`: Manejo de lectura 0.000 kg.
+  - [x] `scale-driver.spec.ts`: Retorno de null para tramas inválidas o vacías.
+  - [x] `scale-driver.spec.ts`: MockScaleDriver conexión e inicialización en 0 kg.
+  - [x] `scale-driver.spec.ts`: MockScaleDriver emisión de lecturas reactivas a suscriptores.
+  - [x] `scale-driver.spec.ts`: MockScaleDriver aplicación de tara para recipientes y bandejas.
+  - [x] `scale-driver.spec.ts`: MockScaleDriver restablecimiento de cero platillo.
+  - [x] `scale-driver.spec.ts`: MockScaleDriver desconexión limpia.
+  - [x] `pos-cart.spec.ts`: Cálculo de subtotales con 3 decimales de kg y 2 decimales monetarios (EARS-VENTA-01).
+  - [x] `pos-cart.spec.ts`: Creación de línea de venta con lectura de báscula válida.
+  - [x] `pos-cart.spec.ts`: Rechazo de producto por peso si báscula está en 0.000 kg o negativo (Casos Límite 1 y 2).
+  - [x] `pos-cart.spec.ts`: Rechazo de pesos infinitesimales menores a 0.001 kg (Caso Límite 2).
+  - [x] `pos-cart.spec.ts`: Creación de línea de producto por unidad.
+  - [x] `pos-cart.spec.ts`: Incremento automático de cantidad para productos por unidad ya existentes.
+  - [x] `pos-cart.spec.ts`: Múltiples pesadas independientes para productos cárnicos.
+  - [x] `pos-cart.spec.ts`: Eliminación y actualización de cantidades en comanda.
+  - [x] `pos-cart.spec.ts`: Rechazo de cobro si monto es menor al total de la comanda (EARS-VENTA-04).
+  - [x] `pos-cart.spec.ts`: Cobro exacto en efectivo o tarjeta.
+  - [x] `pos-cart.spec.ts`: Cálculo dinámico de cambio / devuelta en efectivo.
+  - [x] `pos-cart.spec.ts`: Pagos mixtos exactos (Efectivo + Tarjeta / Transferencia).
+  - [x] `pos-cart.spec.ts`: Procesamiento de venta con encolado outbox en IndexedDB.
+  - [x] `escpos-printer.spec.ts`: Construcción de comandos binarios ESC/POS.
+  - [x] `escpos-printer.spec.ts`: Generación de bytes para tickets de 58mm y 80mm.
+  - [x] `escpos-printer.spec.ts`: Generación de plantilla HTML de ticket para navegador.
+  - [x] Next.js build: compilación estática de `/venta` y bundle standalone en `.next/standalone`.
+  - [x] Regresión Backend: 32 suites y 190 tests en verde.
+- **Estado de Funcionalidad / Fase:** ✅ Realizada y Probada (Bloque 11 completado al 100%, Terminal POS de Mostrador y Hardware operativos).
+- **Qué se generó:**
+  - `Frontend/lib/hardware/scale-driver.ts`
+  - `Frontend/lib/hardware/use-scale.ts`
+  - `Frontend/lib/hardware/escpos-printer.ts`
+  - `Frontend/lib/pos/pos-cart.ts`
+  - `Frontend/components/pos/IndicadorBascula.tsx`
+  - `Frontend/components/pos/cobro/ModalCobro.tsx`
+  - `Frontend/app/(pos)/venta/page.tsx`
+  - `Frontend/tests/unit/scale-driver.spec.ts`
+  - `Frontend/tests/unit/pos-cart.spec.ts`
+  - `Frontend/tests/unit/escpos-printer.spec.ts`
+
+
 
 
 

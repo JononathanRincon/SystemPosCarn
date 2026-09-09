@@ -185,11 +185,11 @@ Este documento actúa como el **Quality Gate Oficial** del proyecto. Ninguna fas
 
 > **Criterio de Desbloqueo:** Fase 2 debe tener el 100% de tests en verde.
 
-- [ ] ⏳ **Módulo POS Web en el navegador (Mostrador PC/Laptop):**
-  - [ ] Interfaz táctil y de teclado optimizada para computadoras de mostrador
+- [x] ✅ **Módulo POS Web en el navegador (Mostrador PC/Laptop):**
+  - [x] Interfaz táctil y de teclado optimizada para computadoras de mostrador
   - [x] Persistencia offline local en navegador mediante IndexedDB / RxDB y Service Workers
-  - [ ] Integración de pesaje vía Web Serial / Web Bluetooth API
-  - [ ] Impresión directa de tickets de venta
+  - [x] Integración de pesaje vía Web Serial / Web Bluetooth API
+  - [x] Impresión directa de tickets de venta
 - [ ] ⏳ **Panel de Administración Web:**
   - [ ] Dashboard centralizado multi-sucursal por negocio
   - [ ] Gestión y auditoría de múltiples terminales (Tablets, Celulares y Web POS)

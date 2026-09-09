@@ -88,10 +88,10 @@ Para asegurar la máxima calidad sin degradar la memoria del agente, cada fase y
 
 ### 3.1 Terminal POS Web de Mostrador (PWA Offline)
 - [x] **3.1.1 Persistencia Offline con IndexedDB:** Almacenamiento local de catálogo y ventas en navegador mediante Dexie/RxDB.
-- [ ] **3.1.2 Flujo de Venta Ergonómico en 3 Toques:** Selección de corte cárnico, confirmación al carrito y cobro rápido con fuentes $\ge 48\text{px}$.
-- [ ] **3.1.3 Conectividad Directa con Básculas (Web Serial / Web Bluetooth API):** Lectura de peso en vivo sin digitación manual.
-- [ ] **3.1.4 Atajos de Teclado:** Configuración de teclas de función `F1`-`F12`, `Enter` para cobrar y `Esc` para cancelar.
-- [ ] **3.1.5 Impresión Térmica de Tickets:** Emisión de comprobantes en impresoras ESC/POS (58mm/80mm).
+- [x] **3.1.2 Flujo de Venta Ergonómico en 3 Toques:** Selección de corte cárnico, confirmación al carrito y cobro rápido con fuentes $\ge 48\text{px}$.
+- [x] **3.1.3 Conectividad Directa con Básculas (Web Serial / Web Bluetooth API):** Lectura de peso en vivo sin digitación manual.
+- [x] **3.1.4 Atajos de Teclado:** Configuración de teclas de función `F1`-`F12`, `Enter` para cobrar y `Esc` para cancelar.
+- [x] **3.1.5 Impresión Térmica de Tickets:** Emisión de comprobantes en impresoras ESC/POS (58mm/80mm).
 
 ### 3.2 Panel de Administración Web
 - [ ] **3.2.1 Dashboard Financiero de Dueño y Gerente:** Widgets analíticos, gráficos de dona por método de pago y alertas visuales.

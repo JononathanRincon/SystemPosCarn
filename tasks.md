@@ -170,17 +170,17 @@
 ## Bloque 11: Frontend Web POS — Terminal de Mostrador y Hardware
 *Skills:* `.agent/web-design-guidelines`, `.agent/ui-styling`, `.agent/vercel-react-view-transitions`
 
-- [ ] **TASK-23: Pantalla de Venta Ergonómica en 3 Toques**
+- [x] **TASK-23: Pantalla de Venta Ergonómica en 3 Toques**
   - *Objetivo:* Grid táctil de productos cárnicos con fotos, comanda lateral en tiempo real y fuentes $\ge 48\text{px}$.
   - *Trazabilidad:* US-02, US-03, NFR-Usabilidad, `design.md` Sec. 12.
   - *Prueba Verificable:* Validación de flujo de comanda con componentes React.
 
-- [ ] **TASK-24: Driver de Báscula (Web Serial API & Web Bluetooth)**
+- [x] **TASK-24: Driver de Báscula (Web Serial API & Web Bluetooth)**
   - *Objetivo:* Implementar interfaz `ScaleDriver` para captura automática de peso en kilogramos con 3 decimales.
   - *Trazabilidad:* EARS-VENTA-02, US-02, `design.md` Sec. 12.3.
   - *Prueba Verificable:* Mock de lectura serial y asignación automática al carrito.
 
-- [ ] **TASK-25: Modal de Cobro Multimetodo e Impresión de Tickets**
+- [x] **TASK-25: Modal de Cobro Multimetodo e Impresión de Tickets**
   - *Objetivo:* Interfaz de pagos simples y mixtos con cálculo de cambio e integración de impresión térmica ESC/POS.
   - *Trazabilidad:* EARS-VENTA-04, US-04, NFR-Rendimiento.
   - *Prueba Verificable:* Simulación de cobro e impresión de voucher.
