@@ -104,10 +104,10 @@ Para asegurar la máxima calidad sin degradar la memoria del agente, cada fase y
 ## FASE 4: APP MÓVIL Y TABLET POS (REACT NATIVE)
 *Skills asociadas:* `.agent/vercel-react-native-skills`, `.agent/ui-ux-pro-max`
 
-- [ ] **4.1 Configuración Base React Native y WatermelonDB:** Base de datos SQLite local para operación 100% offline.
-- [ ] **4.2 Pantalla de Venta Adaptada a Tablets de Mostrador:** Layout horizontal para cajero de pie, botones táctiles $\ge 64\text{px}$.
-- [ ] **4.3 Integración de Hardware Móvil:** Driver de báscula serial/bluetooth y escáner de códigos de barras.
-- [ ] **4.4 Worker de Sincronización en Segundo Plano:** Envío automático de cola outbox hacia `/sales/sync` al detectar internet.
+- [x] **4.1 Configuración Base React Native y WatermelonDB:** Base de datos SQLite local para operación 100% offline.
+- [x] **4.2 Pantalla de Venta Adaptada a Tablets de Mostrador:** Layout horizontal para cajero de pie, botones táctiles $\ge 64\text{px}$.
+- [x] **4.3 Integración de Hardware Móvil:** Driver de báscula serial/bluetooth y escáner de códigos de barras.
+- [x] **4.4 Worker de Sincronización en Segundo Plano:** Envío automático de cola outbox hacia `/sales/sync` al detectar internet.
 - [ ] **4.5 App Móvil de Consulta Gerencial:** Consulta rápida de ventas en tiempo real desde el celular del dueño.
 
 ---
