@@ -190,12 +190,12 @@
 ## Bloque 12: Frontend Web Admin — Dashboards y Gestión de Lotes
 *Skills:* `.agent/ui-ux-pro-max`, `.agent/vercel-optimize`, `.agent/brand`
 
-- [ ] **TASK-26: Dashboard Ejecutivo de Dueño y Gerente**
+- [x] **TASK-26: Dashboard Ejecutivo de Dueño y Gerente**
   - *Objetivo:* Widgets analíticos de ventas del día, márgenes brutos, gráfico de dona de pagos y alertas de lotes por vencer.
   - *Trazabilidad:* EARS-DASH-01, EARS-DASH-02, US-13, US-14.
   - *Prueba Verificable:* Renderizado de métricas y filtros por sucursal.
 
-- [ ] **TASK-27: Módulo de Recepción de Mercancía y Lotes**
+- [x] **TASK-27: Módulo de Recepción de Mercancía y Lotes**
   - *Objetivo:* Formulario de ingreso de camión con verificación de temperatura, proveedor y fechas de caducidad.
   - *Trazabilidad:* EARS-LOTE-01, US-15, US-16.
   - *Prueba Verificable:* Validación de creación de lotes en interfaz web.

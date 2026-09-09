@@ -94,9 +94,9 @@ Para asegurar la máxima calidad sin degradar la memoria del agente, cada fase y
 - [x] **3.1.5 Impresión Térmica de Tickets:** Emisión de comprobantes en impresoras ESC/POS (58mm/80mm).
 
 ### 3.2 Panel de Administración Web
-- [ ] **3.2.1 Dashboard Financiero de Dueño y Gerente:** Widgets analíticos, gráficos de dona por método de pago y alertas visuales.
+- [x] **3.2.1 Dashboard Financiero de Dueño y Gerente:** Widgets analíticos, gráficos de dona por método de pago y alertas visuales.
 - [ ] **3.2.2 Gestión Integral de Catálogo y Precios:** CRUD con subida de fotos y orden de visualización.
-- [ ] **3.2.3 Módulo de Recepción de Mercancía y Lotes:** Interfaz para ingreso de camión con verificación de temperatura y vencimientos.
+- [x] **3.2.3 Módulo de Recepción de Mercancía y Lotes:** Interfaz para ingreso de camión con verificación de temperatura y vencimientos.
 - [ ] **3.2.4 Navegación Ergonómica:** Sidebar colapsable ($\le 7$ opciones), breadcrumbs y barra de búsqueda global `Ctrl+K`.
 
 ---
