@@ -119,9 +119,9 @@ Este documento actúa como el **Quality Gate Oficial** del proyecto. Ninguna fas
   - [x] **Pruebas de Merma:** `Backend/tests/unit/inventario/merma.service.spec.ts`
 
 ### 2.5 Módulo Sincronización Offline-First
-- [ ] ⏳ **Motor de Sincronización Idempotente (Móvil y Web PWA)**
+- [x] ✅ **Motor de Sincronización Idempotente (Móvil y Web PWA)**
   - [x] Endpoint `/sales/sync` idempotente por UUID
-  - [ ] Endpoint `/catalog/sync` con tokens temporales
+  - [x] Endpoint `/catalog/sync` con tokens temporales
   - [x] Manejo de concurrencia y stock negativo sin bloquear caja
   - [x] **Pruebas de Sync Unitarias:** `Backend/tests/unit/sync/sync.service.spec.ts`
   - [x] **Pruebas de Resolución de Conflictos:** `Backend/tests/unit/sync/conflicto.service.spec.ts`
@@ -153,8 +153,8 @@ Este documento actúa como el **Quality Gate Oficial** del proyecto. Ninguna fas
   - [x] Cambio automático de estado a `agotado` cuando `cantidad_disponible = 0`
   - [x] Proceso de vencimiento automático (marcar lotes expirados)
   - [x] Endpoints: `/lots`, `/lots/:id/movements`, `/lots/expiring`, `/receptions`
-  - [ ] **Pruebas Unitarias:** `Backend/tests/unit/inventario/lote.service.spec.ts`
-  - [ ] **Pruebas Unitarias:** `Backend/tests/unit/inventario/recepcion.service.spec.ts`
+  - [x] ✅ **Pruebas Unitarias:** `Backend/tests/unit/inventario/lote.service.spec.ts`
+  - [x] ✅ **Pruebas Unitarias:** `Backend/tests/unit/inventario/recepcion.service.spec.ts`
   - [x] **Pruebas de Integración:** `Backend/tests/integration/lote-fefo.integration.spec.ts`
 
 ### 2.8 Módulo Dashboard (API de Reportes)
