@@ -8,6 +8,8 @@ import { AuthController } from './presentation/http/auth.controller';
 import { AuthGuard } from './presentation/guards/auth.guard';
 import { RolesGuard } from './presentation/guards/roles.guard';
 import { PermissionsGuard } from './presentation/guards/permissions.guard';
+import { USUARIO_REPOSITORY_PORT } from './domain/ports/usuario-repository.port';
+import { InMemoryUsuarioRepository } from './infrastructure/persistence/in-memory-usuario.repository';
 
 @Module({
   imports: [
@@ -17,6 +19,10 @@ import { PermissionsGuard } from './presentation/guards/permissions.guard';
   ],
   controllers: [AuthController],
   providers: [
+    {
+      provide: USUARIO_REPOSITORY_PORT,
+      useClass: InMemoryUsuarioRepository,
+    },
     AuthService,
     HashingService,
     TokenService,
@@ -26,6 +32,7 @@ import { PermissionsGuard } from './presentation/guards/permissions.guard';
     PermissionsGuard,
   ],
   exports: [
+    USUARIO_REPOSITORY_PORT,
     AuthService,
     HashingService,
     TokenService,

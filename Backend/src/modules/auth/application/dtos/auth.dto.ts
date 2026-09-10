@@ -90,5 +90,7 @@ export interface PinLoginResponseDto {
   valid: boolean;
   user: PinLoginUserDto;
   sessionToken: string;
+  accessToken?: string;
+  refreshToken?: string;
 }
 

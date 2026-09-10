@@ -36,4 +36,5 @@ Thumbs.db
 
 # Herramientas y skills locales del agente (no subir a GitHub)
 .agent/
+.agents/
 

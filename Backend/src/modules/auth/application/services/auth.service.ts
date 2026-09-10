@@ -303,6 +303,8 @@ export class AuthService {
         rol: matchingUser.rol,
       },
       sessionToken,
+      accessToken: sessionToken,
+      refreshToken: sessionToken,
     };
   }
 }
