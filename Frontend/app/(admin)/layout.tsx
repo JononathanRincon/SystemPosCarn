@@ -9,6 +9,7 @@ import {
   Warehouse,
   Building2,
   BarChart3,
+  Smartphone,
   Menu,
   X,
   LogOut,
@@ -20,6 +21,7 @@ const sidebarItems = [
   { href: '/catalogo', label: 'Catálogo', icon: Package },
   { href: '/inventario', label: 'Inventario', icon: Warehouse },
   { href: '/sucursales', label: 'Sucursales', icon: Building2 },
+  { href: '/terminales', label: 'Terminales', icon: Smartphone },
   { href: '/reportes', label: 'Reportes', icon: BarChart3 },
 ];
 
