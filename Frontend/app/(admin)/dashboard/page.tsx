@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { apiClient } from '@/lib/api/api-client';
 import {
   TrendingUp,
   DollarSign,
@@ -121,6 +122,40 @@ const CLIENTES_FIADO_MOCK = evaluarCarteraFiada([
 export default function DashboardAdminPage() {
   const [activeTab, setActiveTab] = useState<'ejecutivo' | 'flujo_mermas' | 'smart_fefo'>('ejecutivo');
   const [filtroSucursal, setFiltroSucursal] = useState<string>('todas');
+  const [datosDueño, setDatosDueño] = useState<MetricasDueño>(DATOS_DUEÑO_MOCK);
+
+  useEffect(() => {
+    async function loadDashboardMetrics() {
+      try {
+        const response = await apiClient.get('/dashboard/owner');
+        if (response && response.ventasHoy) {
+          setDatosDueño((prev) => ({
+            ...prev,
+            ventasHoy: typeof response.ventasHoy.totalVentas === 'number' && response.ventasHoy.totalVentas > 0
+              ? response.ventasHoy.totalVentas
+              : prev.ventasHoy,
+            ventasAyer: typeof response.ventasAyer?.totalVentas === 'number' && response.ventasAyer.totalVentas > 0
+              ? response.ventasAyer.totalVentas
+              : prev.ventasAyer,
+            margenBrutoPonderadoPct: typeof response.ventasHoy.porcentajeMargenBruto === 'number' && response.ventasHoy.porcentajeMargenBruto > 0
+              ? response.ventasHoy.porcentajeMargenBruto
+              : prev.margenBrutoPonderadoPct,
+            ticketPromedio: typeof response.ventasHoy.ticketPromedio === 'number' && response.ventasHoy.ticketPromedio > 0
+              ? response.ventasHoy.ticketPromedio
+              : prev.ticketPromedio,
+            transaccionesCount: typeof response.ventasHoy.totalTransacciones === 'number' && response.ventasHoy.totalTransacciones > 0
+              ? response.ventasHoy.totalTransacciones
+              : prev.transaccionesCount,
+            syncTimestamp: response.syncTimestamp || new Date().toISOString(),
+          }));
+        }
+      } catch {
+        // En modo desconectado / desarrollo se preservan fluidamente los datos locales
+      }
+    }
+
+    loadDashboardMetrics();
+  }, [filtroSucursal]);
 
   return (
     <div className="space-y-6 select-none animate-in fade-in duration-150">
@@ -133,7 +168,7 @@ export default function DashboardAdminPage() {
             </span>
             <span className="text-xs text-neutro-400 flex items-center gap-1">
               <Clock size={14} />
-              Última Sync: {new Date(DATOS_DUEÑO_MOCK.syncTimestamp).toLocaleTimeString('es-CO')}
+              Última Sync: {new Date(datosDueño.syncTimestamp).toLocaleTimeString('es-CO')}
             </span>
           </div>
           <h1 className="text-3xl font-extrabold text-neutro-900 tracking-tight mt-1">
@@ -219,11 +254,11 @@ export default function DashboardAdminPage() {
               </div>
               <div className="mt-3">
                 <div className="text-3xl font-black text-neutro-900 tracking-tight">
-                  ${DATOS_DUEÑO_MOCK.ventasHoy.toLocaleString('es-CO')}
+                  ${datosDueño.ventasHoy.toLocaleString('es-CO')}
                 </div>
                 <div className="flex items-center gap-1.5 mt-2 text-xs font-bold text-emerald-600">
                   <ArrowUpRight size={16} />
-                  <span>+{DATOS_DUEÑO_MOCK.deltaVentasPct}% vs. Ayer</span>
+                  <span>+{datosDueño.deltaVentasPct}% vs. Ayer</span>
                 </div>
               </div>
             </div>
@@ -238,7 +273,7 @@ export default function DashboardAdminPage() {
               </div>
               <div className="mt-3">
                 <div className="text-3xl font-black text-carmin-600 tracking-tight">
-                  {DATOS_DUEÑO_MOCK.margenBrutoPonderadoPct}%
+                  {datosDueño.margenBrutoPonderadoPct}%
                 </div>
                 <div className="flex items-center gap-1 mt-2 text-xs text-neutro-500 font-medium">
                   <span>Ponderado con costo real de lotes</span>
@@ -256,11 +291,11 @@ export default function DashboardAdminPage() {
               </div>
               <div className="mt-3">
                 <div className="text-3xl font-black text-neutro-900 tracking-tight">
-                  {DATOS_DUEÑO_MOCK.kilosTotalesDespachados.total.toLocaleString('es-CO')} <span className="text-lg font-bold text-neutro-400">kg</span>
+                  {datosDueño.kilosTotalesDespachados.total.toLocaleString('es-CO')} <span className="text-lg font-bold text-neutro-400">kg</span>
                 </div>
                 <div className="text-xs text-neutro-500 mt-2 flex gap-2">
-                  <span>Res: <strong>{DATOS_DUEÑO_MOCK.kilosTotalesDespachados.res}kg</strong></span>
-                  <span>Cerdo: <strong>{DATOS_DUEÑO_MOCK.kilosTotalesDespachados.cerdo}kg</strong></span>
+                  <span>Res: <strong>{datosDueño.kilosTotalesDespachados.res}kg</strong></span>
+                  <span>Cerdo: <strong>{datosDueño.kilosTotalesDespachados.cerdo}kg</strong></span>
                 </div>
               </div>
             </div>
@@ -275,10 +310,10 @@ export default function DashboardAdminPage() {
               </div>
               <div className="mt-3">
                 <div className="text-3xl font-black text-neutro-900 tracking-tight">
-                  {DATOS_DUEÑO_MOCK.transaccionesCount} <span className="text-lg font-bold text-neutro-400">tickets</span>
+                  {datosDueño.transaccionesCount} <span className="text-lg font-bold text-neutro-400">tickets</span>
                 </div>
                 <div className="text-xs text-neutro-500 mt-2 font-medium">
-                  Promedio: <strong>${DATOS_DUEÑO_MOCK.ticketPromedio.toLocaleString('es-CO')} / ticket</strong>
+                  Promedio: <strong>${datosDueño.ticketPromedio.toLocaleString('es-CO')} / ticket</strong>
                 </div>
               </div>
             </div>
@@ -296,12 +331,12 @@ export default function DashboardAdminPage() {
 
               <div className="space-y-3 pt-2">
                 {[
-                  { label: 'Efectivo en Caja', icon: Banknote, monto: DATOS_DUEÑO_MOCK.desglosePagos.efectivo, color: 'bg-emerald-500' },
-                  { label: 'Tarjetas Débito/Crédito', icon: CreditCard, monto: DATOS_DUEÑO_MOCK.desglosePagos.tarjeta, color: 'bg-blue-500' },
-                  { label: 'Transferencias (Nequi/Daviplata)', icon: Smartphone, monto: DATOS_DUEÑO_MOCK.desglosePagos.transferencia, color: 'bg-purple-500' },
-                  { label: 'Venta a Crédito / Fiado', icon: UserCheck, monto: DATOS_DUEÑO_MOCK.desglosePagos.creditoFiado, color: 'bg-amber-500' },
+                  { label: 'Efectivo en Caja', icon: Banknote, monto: datosDueño.desglosePagos.efectivo, color: 'bg-emerald-500' },
+                  { label: 'Tarjetas Débito/Crédito', icon: CreditCard, monto: datosDueño.desglosePagos.tarjeta, color: 'bg-blue-500' },
+                  { label: 'Transferencias (Nequi/Daviplata)', icon: Smartphone, monto: datosDueño.desglosePagos.transferencia, color: 'bg-purple-500' },
+                  { label: 'Venta a Crédito / Fiado', icon: UserCheck, monto: datosDueño.desglosePagos.creditoFiado, color: 'bg-amber-500' },
                 ].map((item) => {
-                  const pct = Math.round((item.monto / DATOS_DUEÑO_MOCK.ventasHoy) * 100);
+                  const pct = Math.round((item.monto / datosDueño.ventasHoy) * 100);
                   return (
                     <div key={item.label} className="space-y-1">
                       <div className="flex justify-between text-xs font-semibold text-neutro-700">
@@ -344,7 +379,7 @@ export default function DashboardAdminPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-neutro-100">
-                    {DATOS_DUEÑO_MOCK.sucursalesBenchmarking.map((s) => (
+                    {datosDueño.sucursalesBenchmarking.map((s) => (
                       <tr key={s.sucursalId} className="hover:bg-neutro-50/50">
                         <td className="p-3 font-bold text-neutro-900">{s.nombre}</td>
                         <td className="p-3 text-right font-mono font-semibold">${s.ventas.toLocaleString('es-CO')}</td>
@@ -390,7 +425,7 @@ export default function DashboardAdminPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutro-100">
-                  {DATOS_DUEÑO_MOCK.topCortesMargen.map((c) => (
+                  {datosDueño.topCortesMargen.map((c) => (
                     <tr key={c.productoId} className="hover:bg-neutro-50/50">
                       <td className="p-3 font-bold text-neutro-900">{c.nombre}</td>
                       <td className="p-3 text-right font-mono">{c.kilosVendidos} kg</td>

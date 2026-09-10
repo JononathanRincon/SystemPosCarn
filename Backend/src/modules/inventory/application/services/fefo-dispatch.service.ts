@@ -1,4 +1,4 @@
-import { Injectable, Inject, BadRequestException } from '@nestjs/common';
+import { Injectable, Inject, BadRequestException, Optional } from '@nestjs/common';
 import * as crypto from 'crypto';
 import { Lote } from '../../domain/entities/lote.entity';
 import { MovimientoInventario } from '../../domain/entities/movimiento-inventario.entity';
@@ -45,12 +45,15 @@ export interface DespachoFefoResult {
 @Injectable()
 export class FefoDispatchService {
   constructor(
+    @Optional()
     @Inject(LOTE_REPOSITORY)
-    private readonly loteRepo: ILoteRepository,
+    private readonly loteRepo?: ILoteRepository,
+    @Optional()
     @Inject(INVENTARIO_REPOSITORY)
-    private readonly inventarioRepo: IInventarioRepository,
+    private readonly inventarioRepo?: IInventarioRepository,
+    @Optional()
     @Inject(MOVIMIENTO_REPOSITORY)
-    private readonly movimientoRepo: IMovimientoRepository,
+    private readonly movimientoRepo?: IMovimientoRepository,
   ) {}
 
   /**
@@ -64,6 +67,17 @@ export class FefoDispatchService {
     if (!input.sucursalId) throw new BadRequestException('El sucursalId es obligatorio');
     if (!input.cantidad || input.cantidad <= 0) {
       throw new BadRequestException('La cantidad a despachar debe ser mayor a cero');
+    }
+
+    if (!this.loteRepo) {
+      return {
+        productoId: input.productoId,
+        cantidadTotalDespachada: 0,
+        cantidadPendienteSinLote: input.cantidad,
+        asignaciones: [],
+        costoTotalDespacho: 0,
+        completamenteCubierto: false,
+      };
     }
 
     const cantidadSolicitada = Number(input.cantidad.toFixed(3));

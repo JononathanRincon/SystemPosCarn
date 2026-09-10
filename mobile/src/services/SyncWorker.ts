@@ -2,6 +2,8 @@ import NetInfo from '@react-native-community/netinfo';
 import { Database, Q } from '@nozbe/watermelondb';
 import { VentaOutbox } from '../database/models/VentaOutbox';
 import { getDatabase } from '../database';
+import { getApiBaseUrl } from '../config/api';
+import { AuthService } from './AuthService';
 
 /**
  * Generador de UUIDv4 compatible con Node.js, React Native y navegadores.
@@ -18,7 +20,7 @@ export function generateUUID(): string {
 }
 
 export interface SyncWorkerConfig {
-  /** URL del endpoint de sincronización del backend NestJS (default: http://localhost:3000/sales/sync) */
+  /** URL del endpoint de sincronización del backend NestJS (default: dynamic api url /sales/sync) */
   apiUrl?: string;
   /** Identificador de la terminal tablet POS (default: tablet-mostrador-01) */
   dispositivoId?: string;
@@ -62,7 +64,7 @@ export class SyncWorker {
   constructor(config?: SyncWorkerConfig) {
     this.database = config?.database ?? getDatabase();
     this.config = {
-      apiUrl: config?.apiUrl ?? 'http://localhost:3000/sales/sync',
+      apiUrl: config?.apiUrl ?? `${getApiBaseUrl()}/sales/sync`,
       dispositivoId: config?.dispositivoId ?? 'tablet-mostrador-01',
       batchSize: config?.batchSize ?? 25,
       autoStart: config?.autoStart ?? true,
@@ -213,13 +215,20 @@ export class SyncWorker {
           throw new Error('No fetch implementation available in current environment');
         }
 
+        const requestHeaders: Record<string, string> = {
+          'Content-Type': 'application/json',
+          'Idempotency-Key': idempotencyKey,
+        };
+
+        const sessionToken = AuthService.getSessionToken();
+        if (sessionToken) {
+          requestHeaders['Authorization'] = `Bearer ${sessionToken}`;
+        }
+
         try {
           const response = await fetchFn(this.config.apiUrl, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Idempotency-Key': idempotencyKey,
-            },
+            headers: requestHeaders,
             body: JSON.stringify(requestBody),
           });
 
