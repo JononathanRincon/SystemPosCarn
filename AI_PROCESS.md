@@ -1745,6 +1745,84 @@ PLANTILLA ESQUELETO PARA NUEVAS ENTRADAS
   - `mobile/tests/scale-bridge.spec.ts`
   - `mobile/tests/sync-worker.spec.ts`
 
+---
+
+## Entrada 28: TASK-31 - Integración E2E Completa (Backend NestJS + Frontend Next.js + Mobile React Native)
+
+- **Fecha:** 2026-09-10
+- **Modelo/herramienta:** Antigravity (Gemini 3.8 Flash)
+- **Prompt utilizado (completo):**
+  ```text
+  Prompt de Implementación: Integración E2E Completa (Backend NestJS + Frontend Next.js + Mobile React Native)
+  TASK-31: Validación de Quality Gate Completo (100% Tests en Verde)
+  ```
+- **Output del agente / Respuesta de la herramienta (mensaje final):**
+  ```text
+  TASK-31 completada exitosamente:
+  1. Backend NestJS:
+     - Ensamblado AppModule con los 7 módulos de dominio y 4 de infraestructura.
+     - Creado main.ts en puerto 3001 con CORS, Helmet, ValidationPipe y rutas directas.
+     - Enriquecido PIN Login con accessToken y refreshToken en AuthModule.
+     - Suite E2E de conectividad (6/6 tests en verde).
+  2. Frontend Next.js:
+     - Creado cliente HTTP api-client.ts con timeout de 5000ms e inyección Bearer.
+     - Implementado motor de sincronización sync-client.ts para ventas outbox en Dexie.js.
+     - Integrado botón 'Sincronizar ahora' con badge en tiempo real en (pos)/venta/page.tsx.
+     - Conectado login PIN con fallback offline en (pos)/login-pin/page.tsx.
+     - Conectado consumo de métricas reales GET /dashboard/owner en (admin)/dashboard/page.tsx.
+     - Suite unitaria api-and-sync.spec.ts (7/7 tests en verde).
+  3. Mobile React Native:
+     - Configuración dinámica de API host api.ts (Android 10.0.2.2:3001, iOS localhost:3001, LAN configurable).
+     - Servicio AuthService con login PIN y token session en memoria.
+     - SyncWorker alineado con host dinámico e inyección automática de Bearer token.
+     - Servicio CatalogSync con descarga e ingesta a WatermelonDB SQLite.
+     - Suite de integración mobile-integration.spec.ts (11/11 tests en verde).
+  4. Calidad y Cobertura:
+     - Backend: 33 suites, 196 tests en verde (100%).
+     - Frontend: 7 suites, 64 tests en verde (100%).
+     - Mobile: 7 suites, 138 tests en verde (100%).
+     - Total monorepo: 47 suites, 398 tests pasando al 100% con 0 fallos.
+  ```
+- **Acciones de Git:**
+  - Rama: `feature/TASK-31-integracion-e2e-backend-frontend-mobile`
+  - Commits:
+    - `feat(backend): ensamblar app.module y main con cors` (`e605bec`)
+    - `feat(frontend): cliente api y boton sincronizar ahora` (`083126b`)
+    - `feat(mobile): configuracion dinamica de host para sync` (`d6e2eea`)
+    - `test(e2e): suite de conectividad backend-frontend-mobile` (`8f926d0`)
+  - Estado del merge: `Merged (--no-ff) into develop`
+- **Reporte de pruebas automatizadas:**
+  | Suite / Nivel | Total | ✅ Pasaron | ❌ Fallaron | Cobertura (%) |
+  |---|---|---|---|---|
+  | Backend (Unitarias + Integración + E2E) | 196 | 196 | 0 | 100% |
+  | Frontend Web (Vitest Unitarias + Sync) | 64 | 64 | 0 | 100% |
+  | Mobile (Jest React Native + WatermelonDB) | 138 | 138 | 0 | 100% |
+  | **Total Monorepo** | **398** | **398** | **0** | **100%** |
+- **Lista detallada de pruebas ejecutadas:**
+  - [x] `Backend/tests/integration/e2e-connectivity.integration.spec.ts`: POST /auth/pin-login emisión de tokens JWT.
+  - [x] `Backend/tests/integration/e2e-connectivity.integration.spec.ts`: POST /sales/sync ingesta idempotente con Idempotency-Key.
+  - [x] `Backend/tests/integration/e2e-connectivity.integration.spec.ts`: GET /dashboard/owner consumo autorizado de KPIs.
+  - [x] `Frontend/tests/unit/api-and-sync.spec.ts`: Cliente HTTP fetch con timeout y Authorization header.
+  - [x] `Frontend/tests/unit/api-and-sync.spec.ts`: Sincronización outbox Dexie.js a status 'synced'.
+  - [x] `mobile/tests/mobile-integration.spec.ts`: Resolución dinámica de host Android/iOS/LAN.
+  - [x] `mobile/tests/mobile-integration.spec.ts`: AuthService login PIN y fallback offline.
+  - [x] `mobile/tests/mobile-integration.spec.ts`: SyncWorker inyección de Bearer token.
+  - [x] `mobile/tests/mobile-integration.spec.ts`: CatalogSync ingesta de productos y categorías a WatermelonDB.
+- **Estado de Funcionalidad / Fase:** ✅ Realizada y Probada (TASK-31 completada al 100%, Quality Gate E2E verificado).
+- **Qué se generó:**
+  - `Backend/src/app.module.ts`
+  - `Backend/src/main.ts`
+  - `Backend/src/modules/auth/infrastructure/persistence/in-memory-usuario.repository.ts`
+  - `Backend/tests/integration/e2e-connectivity.integration.spec.ts`
+  - `Frontend/lib/api/api-client.ts`
+  - `Frontend/lib/sync/sync-client.ts`
+  - `Frontend/tests/unit/api-and-sync.spec.ts`
+  - `mobile/src/config/api.ts`
+  - `mobile/src/services/AuthService.ts`
+  - `mobile/src/services/CatalogSync.ts`
+  - `mobile/tests/mobile-integration.spec.ts`
+
+
 
 
 

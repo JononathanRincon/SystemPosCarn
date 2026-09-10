@@ -225,7 +225,7 @@
 ## Bloque 14: Pruebas E2E, Despliegue en Vercel y Producción
 *Skills:* `.agent/deploy-to-vercel`, `.agent/vercel-cli-with-tokens`, `.agent/Anthropic-Cybersecurity-Skills-main`
 
-- [ ] **TASK-31: Validación de Quality Gate Completo (100% Tests en Verde)**
+- [x] **TASK-31: Validación de Quality Gate Completo (100% Tests en Verde)**
   - *Objetivo:* Ejecución de toda la suite de pruebas unitarias y de integración del backend y frontend.
   - *Trazabilidad:* DoD Sec. 15, `FASE_TRACKING.md`.
   - *Prueba Verificable:* Reporte de Jest con cobertura $\ge 90\%$ en core y 100% de suites pasando.
