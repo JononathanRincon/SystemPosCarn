@@ -12,6 +12,7 @@ import {
   Flame,
   Utensils,
   ArrowRight,
+  RefreshCw,
 } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { ProductoLocal, CategoriaLocal } from '@/lib/db/pos-database';
@@ -20,6 +21,10 @@ import {
   obtenerProductosLocales,
   guardarCatalogoLocal,
 } from '@/lib/db/repos/catalogo-repo';
+import {
+  sincronizarVentasPendientes,
+  obtenerConteoPendientesSync,
+} from '@/lib/sync/sync-client';
 import {
   CartItem,
   agregarAlCarrito,
@@ -86,8 +91,42 @@ export default function VentaPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [alertaBascula, setAlertaBascula] = useState<string | null>(null);
   const [modalCobroAbierto, setModalCobroAbierto] = useState<boolean>(false);
+  const [pendingSyncCount, setPendingSyncCount] = useState<number>(0);
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const [syncFeedback, setSyncFeedback] = useState<string | null>(null);
 
   const { weightKg, getLatestWeight } = useScale();
+
+  const refreshPendingCount = useCallback(async () => {
+    try {
+      const count = await obtenerConteoPendientesSync();
+      setPendingSyncCount(count);
+    } catch {
+      // Manejo silencioso en IndexedDB
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshPendingCount();
+    const interval = setInterval(refreshPendingCount, 10000);
+    return () => clearInterval(interval);
+  }, [refreshPendingCount]);
+
+  const handleManualSync = async () => {
+    setIsSyncing(true);
+    setSyncFeedback(null);
+    try {
+      const result = await sincronizarVentasPendientes();
+      setSyncFeedback(result.mensaje);
+      await refreshPendingCount();
+      setTimeout(() => setSyncFeedback(null), 4000);
+    } catch {
+      setSyncFeedback('Error durante la sincronización');
+      setTimeout(() => setSyncFeedback(null), 4000);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   // 1. Cargar catálogo desde IndexedDB (con siembra automática si está vacío)
   useEffect(() => {
@@ -228,9 +267,38 @@ export default function VentaPage() {
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-neutro-950 text-white select-none">
-      {/* ─── BARRA SUPERIOR DE MOSTRADOR CON BÁSCULA EN VIVO ─── */}
-      <header className="px-4 py-2 border-b border-neutro-800 bg-neutro-900/80 backdrop-blur-sm z-10">
-        <IndicadorBascula />
+      {/* ─── BARRA SUPERIOR DE MOSTRADOR CON BÁSCULA EN VIVO Y SINCRONIZACIÓN ─── */}
+      <header className="px-4 py-2 border-b border-neutro-800 bg-neutro-900/80 backdrop-blur-sm z-10 flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="flex-1">
+          <IndicadorBascula />
+        </div>
+        <div className="flex items-center gap-2.5 justify-end">
+          <button
+            type="button"
+            onClick={handleManualSync}
+            disabled={isSyncing}
+            className={cn(
+              'min-h-touch px-4 rounded-2xl border font-bold text-xs flex items-center gap-2 transition-all active:scale-95 shadow-sm',
+              pendingSyncCount > 0
+                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30'
+                : 'bg-neutro-800 text-neutro-300 border-neutro-700 hover:bg-neutro-700'
+            )}
+            title="Sincronizar ventas offline con el servidor"
+          >
+            <RefreshCw size={16} className={cn(isSyncing && 'animate-spin text-carmin-400')} />
+            <span>Sincronizar ahora</span>
+            {pendingSyncCount > 0 && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500 text-neutro-950 animate-pulse">
+                {pendingSyncCount}
+              </span>
+            )}
+          </button>
+          {syncFeedback && (
+            <div className="px-3 py-1.5 rounded-xl bg-neutro-800/90 border border-neutro-700 text-xs font-semibold text-emerald-400 animate-in fade-in">
+              {syncFeedback}
+            </div>
+          )}
+        </div>
       </header>
 
       {/* ─── CUERPO PRINCIPAL DEL POS ─── */}
