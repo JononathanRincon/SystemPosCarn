@@ -1822,6 +1822,60 @@ PLANTILLA ESQUELETO PARA NUEVAS ENTRADAS
   - `mobile/src/services/CatalogSync.ts`
   - `mobile/tests/mobile-integration.spec.ts`
 
+---
+
+## Entrada 29: Cierre Definitivo de Fase 2 (Backend Core - Catalog Sync & Lotes/Recepción Unit Tests)
+
+- **Fecha:** 2026-09-10
+- **Modelo/herramienta:** Antigravity (Gemini 3.8 Flash)
+- **Prompt utilizado (resumen):**
+  ```text
+  Cierre Definitivo Fase 2: Implementar endpoint GET /catalog/sync con syncToken, registrar en CatalogModule y crear pruebas unitarias aisladas lote.service.spec.ts y recepcion.service.spec.ts.
+  ```
+- **Output del agente / Respuesta de la herramienta:**
+  - Implementado `CatalogSyncController` con `GET /catalog/sync` retornando `{ syncToken, productos, categorias }`.
+  - Registrado en `CatalogModule` de forma 100% aditiva.
+  - Creadas suites unitarias `catalog-sync.spec.ts`, `lote.service.spec.ts` (invariantes de 3 decimales, alerta <= 3 días y mutación a 'agotado') y `recepcion.service.spec.ts` (control de cadena de frío y lotes).
+- **Acciones de Git:**
+  - Rama: `feature/TASK-FASE2-cierre-sync-catalogo-y-tests`
+  - Commit: `77dfc92 feat(catalog): endpoint GET /catalog/sync con syncToken y tests unitarios de lotes y recepcion (Fase 2)`
+  - Merge: `Merged (--no-ff) into develop`
+- **Reporte de pruebas automatizadas:**
+  | Suite / Nivel | Total | ✅ Pasaron | ❌ Fallaron | Cobertura (%) |
+  |---|---|---|---|---|
+  | Backend (36 suites) | 206 | 206 | 0 | 100% |
+- **Estado de Funcionalidad / Fase:** ✅ Realizada y Probada (Fase 2 cerrada al 100% en `FASE_TRACKING.md`).
+
+---
+
+## Entrada 30: Cierre Definitivo de Fase 3 (Web Admin - Catálogo, Precios y Auditoría de Terminales)
+
+- **Fecha:** 2026-09-10
+- **Modelo/herramienta:** Antigravity (Gemini 3.8 Flash)
+- **Prompt utilizado (resumen):**
+  ```text
+  Cierre Definitivo Fase 3: Implementar DevicesController en Backend, páginas (admin)/catalogo y (admin)/terminales en Frontend, navegación en layout y suites de pruebas de regresión.
+  ```
+- **Output del agente / Respuesta de la herramienta:**
+  - Backend: `DevicesController` con `GET /devices` y `PATCH /devices/:id/revoke`. Registrado en `CatalogModule`.
+  - Frontend: `Frontend/app/(admin)/catalogo/page.tsx` con filtros por categoría, precios en línea y modal de creación conectado a `apiClient`.
+  - Frontend: `Frontend/app/(admin)/terminales/page.tsx` con badges de estado en vivo, turno activo y revocación de terminales.
+  - Navegación: Añadido `Terminales` en `sidebarItems` de `layout.tsx` de forma aditiva.
+  - Pruebas: `devices.controller.spec.ts` en Backend y `admin-pages.spec.ts` en Frontend.
+- **Acciones de Git:**
+  - Rama: `feature/TASK-FASE3-admin-catalogo-y-terminales`
+  - Commit: `fea12c9 feat(admin): panel de administracion con catalogo, precios y terminales (Fase 3)`
+  - Merge: `Merged (--no-ff) into develop`
+- **Reporte de pruebas automatizadas:**
+  | Suite / Nivel | Total | ✅ Pasaron | ❌ Fallaron | Cobertura (%) |
+  |---|---|---|---|---|
+  | Backend (37 suites) | 209 | 209 | 0 | 100% |
+  | Frontend Web (8 suites) | 69 | 69 | 0 | 100% |
+  | Mobile (7 suites) | 138 | 138 | 0 | 100% |
+  | **Total Monorepo** | **416** | **416** | **0** | **100%** |
+- **Estado de Funcionalidad / Fase:** ✅ Realizada y Probada (Fase 3 cerrada al 100% en `FASE_TRACKING.md`).
+
+
 
 
 
