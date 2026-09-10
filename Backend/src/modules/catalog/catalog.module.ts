@@ -13,10 +13,11 @@ import { CatalogCacheListener } from './application/listeners/catalog-cache.list
 import { BranchesController } from './presentation/http/branches.controller';
 import { CategoriesController } from './presentation/http/categories.controller';
 import { ProductsController } from './presentation/http/products.controller';
+import { CatalogSyncController } from './presentation/http/catalog-sync.controller';
 
 @Module({
   imports: [AuthModule, CacheModule, EventsModule],
-  controllers: [BranchesController, CategoriesController, ProductsController],
+  controllers: [BranchesController, CategoriesController, ProductsController, CatalogSyncController],
   providers: [
     NegocioService,
     SucursalService,
