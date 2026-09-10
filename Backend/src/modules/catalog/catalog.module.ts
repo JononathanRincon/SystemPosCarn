@@ -14,10 +14,11 @@ import { BranchesController } from './presentation/http/branches.controller';
 import { CategoriesController } from './presentation/http/categories.controller';
 import { ProductsController } from './presentation/http/products.controller';
 import { CatalogSyncController } from './presentation/http/catalog-sync.controller';
+import { DevicesController } from './presentation/http/devices.controller';
 
 @Module({
   imports: [AuthModule, CacheModule, EventsModule],
-  controllers: [BranchesController, CategoriesController, ProductsController, CatalogSyncController],
+  controllers: [BranchesController, CategoriesController, ProductsController, CatalogSyncController, DevicesController],
   providers: [
     NegocioService,
     SucursalService,
